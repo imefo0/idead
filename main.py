@@ -15,6 +15,7 @@ command = sys.argv[1:]
 
 def main():
     # TODO: вынести в parser.py потом
+    # TODO: изменить условия на словари
 
     # команды:
     # idead new idea <name> <idea>
