@@ -10,7 +10,9 @@ if project_dir not in sys.path:
 import ideas
 
 command = sys.argv[1:]
-print(command)
+
+#print(command)
+
 def main():
     # TODO: вынести в parser.py потом
 
@@ -19,7 +21,12 @@ def main():
 
     if command[0] == "new":
         if command[1] == "idea":
-            ideas.new(command[2].replace(" ", "\\ "), command[3].replace(" ", "\\ "), command[4].replace(" ", "\\ "))
+            # TODO: изменить так чтобы можно было не ставить дату или описание
+            # TODO: изменить синтаксис
+            try:
+                ideas.new(command[2].replace(" ", "\\ "), command[3].replace(" ", "\\ "), command[4].replace(" ", "\\ "))
+            except:
+                print("Using: idead new idea <name> <about> <date>")
 
 if __name__ == "__main__":
     main()
