@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# пусть эта строка доживет до релиза
 
 import sys
 import os
