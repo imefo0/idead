@@ -21,6 +21,10 @@ def main():
     # команды:
     # idead new idea <name> <idea>
 
+    if len(command) == 0:
+        print("Using: idead <new>...")
+        return
+
     if command[0] == "new":
         if command[1] == "idea":
             # TODO: изменить так чтобы можно было не ставить дату или описание
