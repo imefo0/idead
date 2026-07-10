@@ -4,7 +4,8 @@ import subprocess
 
 # управление идеями
 
-local_path = "/home/imefo/.local/share/idead"
+user = os.getenv("USER")
+local_path = f"/home/{user}/.local/share/idead"
 # создание всех каталогов
 os.system(f"mkdir -p {local_path}/ideas/all")
 
