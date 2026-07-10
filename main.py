@@ -36,7 +36,8 @@ def main():
                 print("Using: idead new idea <name> <about> <date>")
     elif command[0] == "list":
         if command[1] == "idea":
-            ideas.list_()
+            try: ideas.list_()
+            except: print("Using: idead list idea")
 
 if __name__ == "__main__":
     main()
