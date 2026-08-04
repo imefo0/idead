@@ -33,7 +33,7 @@ def new_idea(name, desc):
     time_now = datetime.now().strftime("%Y-%m-%d %H:%M")
     time_now_mini = now = datetime.now().strftime("%Y%m%d%H%M")
 
-    content = f"---\nname:{name}\ncreate_time:{time_now}---\n{desc}"
+    content = f"---\nname: {name}\ncreate_time: {time_now}\n---\n{desc}"
 
     (folder_ideas / f"i{time_now_mini}.md").write_text(content)
 
