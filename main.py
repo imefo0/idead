@@ -40,6 +40,9 @@ def new_idea(name, desc):
 def main():
     if command[0] == "init":
         init()
+    elif command[0] == "new":
+        if command[1] == "idea":
+            new_idea(command[2], command[3])
 
 # TODO: добавить add, remove, rename, rewrite idea
 # добавить название языка в waybar, nvim
