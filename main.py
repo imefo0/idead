@@ -2,6 +2,7 @@ import os
 import subprocess
 from pathlib import Path
 import sys
+from datetime import datetime # now = datetime.now().strftime("%Y-%m-%d %H:%M")
 
 home = Path.home()
 
@@ -28,9 +29,21 @@ def init():
     folder_tasks.mkdir(parents=True, exist_ok=True)
     folder_guides.mkdir(parents=True, exist_ok=True)
 
+def new_idea(name, desc):
+    time_now = datetime.now().strftime("%Y-%m-%d %H:%M")
+    time_now_mini = now = datetime.now().strftime("%Y%m%d%H%M")
+
+    content = f"---\nname:{name}\ncreate_time:{time_now}---\n{desc}"
+
+    (folder_ideas / f"i{time_now_mini}.md").write_text(content)
+
 def main():
     if command[0] == "init":
         init()
+
+# TODO: добавить add, remove, rename, rewrite idea
+# добавить название языка в waybar, nvim
+# добавить поддержку версий и для идей
 
 if __name__ == "__main__":
     main()
