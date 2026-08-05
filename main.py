@@ -37,6 +37,18 @@ def new_idea(name, desc):
 
     (folder_ideas / f"i{time_now_mini}.md").write_text(content)
 
+def remove_idea_by_date(date):
+    pass
+
+def remove_idea_by_name(name):
+    pass
+
+def remove_idea_by_uuid(uuid):
+    pass
+
+def remove_idea_by_custom_metadata(): pass
+
+
 def main():
     if command[0] == "init":
         init()
