@@ -39,8 +39,6 @@ def new_idea(name, desc):
 
     (folder_ideas / f"i{time_now_mini}.md").write_text(content)
 
-def remove_idea_by_date(date):
-    pass
 def get_list_of_files(folder):
     files = []
 
@@ -49,6 +47,29 @@ def get_list_of_files(folder):
             files.append(item.name)
 
     return files
+
+def remove_idea_by_date(date, time=False):
+    if time == False: # только по дате
+        coincidences = []
+        for i in get_list_of_files(folder_ideas): # i202608041359_dd0cd3.md -> i 2026-08-04 13:59 _ dd0cd3 .md
+            if i[1:9] == date:
+                coincidences.append(i)
+
+        if len(coincidences) == 0: # нет идей
+            # TODO: добавить класс Error и добавить эту ошибку как Error.NoMatchesFound
+            print("E: No Matches Found")
+        elif len(coincidences) == 1:
+            # TODO: добавить так чтобы была понятна какая идея удаляется
+            answer = input("Are you sure you want to delete this idea? [yn] ")
+            if answer.lower() in ["y", "yes"]: # TODO: вынести список из y и yes в отдельную переменную для конфига
+                print("Deleting idea...")
+                (folder_ideas / coincidences[0]).unlink()
+        else: # много идей
+            print("E: Too many ideas for a single date")
+
+    else: # по дате и времени
+        if time[:1].isdigit() and time[2] == ":" and time[3:].isdigit():
+            pass
 
 
 def remove_idea_by_name(name):
@@ -61,12 +82,14 @@ def remove_idea_by_custom_metadata(): pass
 
 
 def main():
-    if command[0] == "init":
-        init()
-    elif command[0] == "new":
-        if command[1] == "idea":
-            new_idea(command[2], command[3])
+    if len(command) > 0:
+        if command[0] == "init":
+            init()
+        elif command[0] == "new":
+            if command[1] == "idea":
+                new_idea(command[2], command[3])
 
+    remove_idea_by_name("Abc")
 # TODO: добавить add, remove, rename, rewrite idea
 # добавить название языка в waybar, nvim
 # добавить поддержку версий и для идей
