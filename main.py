@@ -19,6 +19,8 @@ folder_guides = folder_data / "guides"
 
 command = sys.argv[1:]
 
+ideas_format = "md"
+
 def init():
     folder_config.mkdir(parents=True, exist_ok=True)
     folder_data.mkdir(parents=True, exist_ok=True)
@@ -39,6 +41,15 @@ def new_idea(name, desc):
 
 def remove_idea_by_date(date):
     pass
+def get_list_of_files(folder):
+    files = []
+
+    for item in folder.iterdir():
+        if item.is_file():
+            files.append(item.name)
+
+    return files
+
 
 def remove_idea_by_name(name):
     pass
