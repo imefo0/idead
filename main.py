@@ -32,7 +32,7 @@ def init():
     folder_tasks.mkdir(parents=True, exist_ok=True)
     folder_guides.mkdir(parents=True, exist_ok=True)
 
-def new_idea(name, desc): # FIX: исправить то что uuid нету
+def new_idea(name, desc):
     time_now = datetime.now().strftime("%Y-%m-%d %H:%M")
     time_now_mini = now = datetime.now().strftime("%Y%m%d%H%M")
 
@@ -61,21 +61,27 @@ def remove_idea_by_date(date, time=False):
             # TODO: добавить класс Error и добавить эту ошибку как Error.NoMatchesFound
             # TODO: добавить класс Error и добавить ошибку Error.IncorrectDate / IncorrectInput
             print("E: No Matches Found")
+
         elif len(coincidences) == 1:
             # TODO: добавить так чтобы была понятна какая идея удаляется
             answer = input("Are you sure you want to delete this idea? [yn] ")
+
             if answer.lower() in ["y", "yes"]: # TODO: вынести список из y и yes в отдельную переменную для конфига
                 print("Deleting idea...")
                 (folder_ideas / coincidences[0]).unlink()
+
         else: # много идей
+            # TODO: добавить удаление нескольких идей сразу
             print(f"Found {len(coincidences)} ideas for {date[0:4]}-{date[4:6]}-{date[6:]}:")
             print("-"*30) # TODO: добавить переменную для этого числа (30)
+
             for i in range(len(coincidences)):
                 print(f"  {i+1}. {date[0:4]}-{date[4:6]}-{date[6:]} {coincidences[i][9:11]}:{coincidences[i][11:13]} [{coincidences[i][14:-3]}]")
+
             print("-"*30)
-            # TODO: ПРОТЕСТИРОВАТЬ ЭТУ ДИЧЬ
+            # TEST: ПРОТЕСТИРОВАТЬ ЭТУ ДИЧЬ
             answer = int(input(f"Enter number to delete (1-{len(coincidences)}, or 0 to cancel): "))
-            # TODO: добавить проверку на число
+            # WARN: добавить проверку на число
             if answer != 0:
                 new_answer = input("Are you sure you want to delete this idea? [yn] ")
                 if new_answer.lower() in ["y", "yes"]: # TODO: вынести список из y и yes в отдельную переменную для конфига
