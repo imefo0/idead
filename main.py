@@ -110,9 +110,11 @@ def main():
         elif command[0] == "new":
             if command[1] == "idea":
                 new_idea(command[2], command[3])
-    remove_idea_by_date(input("enter date: "))
+        elif command[0] == "remove":
+            if command[1] == "idea":
+                if "--date" in command[2:]:
+                    remove_idea_by_date(command[command.index("--date")+1])
 
-    remove_idea_by_name("Abc")
 # TODO: добавить add, remove, rename, rewrite idea
 # добавить название языка в waybar, nvim
 # добавить поддержку версий и для идей
