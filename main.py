@@ -65,7 +65,20 @@ def remove_idea_by_date(date, time=False):
                 print("Deleting idea...")
                 (folder_ideas / coincidences[0]).unlink()
         else: # много идей
-            print("E: Too many ideas for a single date")
+            print(f"Found {len(coincidences)} ideas for {date[0:4]}-{date[4:6]}-{date[6:]}:")
+            print("-"*20)
+            for i in range(len(coincidences)):
+                print(f"  {i}. {date[0:4]}-{date[4:6]}-{date[6:]} {coincidences[i][9:11]}:{coincidences[i][11:13]} [{coincidences[i][14:-3]}]")
+            print("-"*20)
+            # TODO: ПРОТЕСТИРОВАТЬ ЭТУ ДИЧЬ
+            answer = int(input(f"Enter number to delete (1-{len(coincidences)}, or 0 to cancel): "))
+            # TODO: добавить проверку на число
+            if answer != 0:
+                new_answer = input("Are you sure you want to delete this idea? [yn] ")
+                if new_answer.lower() in ["y", "yes"]: # TODO: вынести список из y и yes в отдельную переменную для конфига
+                    print("Deleting idea...")
+                    (folder_ideas / coincidences[answer-1]).unlink()
+
 
     else: # по дате и времени
         if time[:1].isdigit() and time[2] == ":" and time[3:].isdigit():
