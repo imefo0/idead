@@ -3,6 +3,7 @@ import subprocess
 from pathlib import Path
 import sys
 from datetime import datetime # now = datetime.now().strftime("%Y-%m-%d %H:%M")
+import uuid
 
 home = Path.home()
 
@@ -35,9 +36,10 @@ def new_idea(name, desc): # FIX: исправить то что uuid нету
     time_now = datetime.now().strftime("%Y-%m-%d %H:%M")
     time_now_mini = now = datetime.now().strftime("%Y%m%d%H%M")
 
-    content = f"---\nname: {name}\ncreate_time: {time_now}\n---\n{desc}"
+    uuid12 = uuid.uuid4().hex[:6]
+    content = f"---\nname: {name}\ncreate_time: {time_now}\nuuid: {uuid12}\n---\n{desc}"
 
-    (folder_ideas / f"i{time_now_mini}.md").write_text(content)
+    (folder_ideas / f"i{time_now_mini}_{uuid12}.md").write_text(content)
 
 def get_list_of_files(folder):
     files = []
