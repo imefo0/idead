@@ -41,7 +41,7 @@ def new_idea(name, desc):
     time_now_mini = now = datetime.now().strftime("%Y%m%d%H%M")
 
     uuid12 = uuid.uuid4().hex[:6]
-    content = f"---\nname: {name}\ncreate_time: {time_now}\nuuid: {uuid12}\n---\n{desc}"
+    content = f"---\nname: {name}\ncreate_time: {time_now}\nuuid: {uuid12}\nversion: {idea_version}\n---\n{desc}"
 
     (folder_ideas / f"i{time_now_mini}_{uuid12}.md").write_text(content)
 
