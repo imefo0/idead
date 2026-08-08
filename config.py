@@ -22,3 +22,4 @@ separator_symbol = "-"
 
 delete_idea_ask = "Are you sure you want to delete this idea?"
 
+ideas_version = "1.0"
