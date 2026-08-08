@@ -110,10 +110,26 @@ def remove_idea_by_date(date=False, time=False):
                 print("Deleting idea...")
                 (folder_ideas / coincidences[answer-1]).unlink()
 
-def remove_idea_by_name(name):
-    pass
+def remove_idea_by_uuid(uuid_):
 
-def remove_idea_by_uuid(uuid):
+    coincidences = []
+    for i in get_list_of_files(folder_ideas): # i202608041359_dd0cd3.md -> i 2026-08-04 13:59 _ dd0cd3 .md
+        if i[14:20] == uuid_:
+            coincidences.append(i)
+
+    if len(coincidences) == 0: # нет идей
+        # TODO: добавить класс Error и добавить эту ошибку как Error.NoMatchesFound
+        # TODO: добавить класс Error и добавить ошибку Error.IncorrectDate / IncorrectInput
+        print("E: No Matches Found")
+
+    elif len(coincidences) == 1:
+        # TODO: добавить так чтобы была понятна какая идея удаляется
+
+        if warning(delete_idea_ask):
+            print("Deleting idea...")
+            (folder_ideas / coincidences[0]).unlink()
+
+def remove_idea_by_name(name):
     pass
 
 def remove_idea_by_custom_metadata(): pass
@@ -128,12 +144,16 @@ def main():
                 new_idea(command[2], command[3])
         elif command[0] == "remove":
             if command[1] == "idea":
-                if "--date" in command[2:] and "--time" in command[2:]:
-                    remove_idea_by_date(command[command.index("--date")+1], command[command.index("--time")+1])
-                elif "--date" in command[2:]:
-                    remove_idea_by_date(date=command[command.index("--date")+1])
-                elif "--time" in command[2:]:
-                    remove_idea_by_date(time=command[command.index("--time")+1])
+                if "--date" in command[2:] or "--time" in command[2:]:
+                    if "--date" in command[2:] and "--time" in command[2:]:
+                        remove_idea_by_date(command[command.index("--date")+1], command[command.index("--time")+1])
+                    elif "--date" in command[2:]:
+                        remove_idea_by_date(date=command[command.index("--date")+1])
+                    elif "--time" in command[2:]:
+                        remove_idea_by_date(time=command[command.index("--time")+1])
+                else:
+                    if "--uuid" in command[2:]:
+                        remove_idea_by_uuid(command[command.index("--uuid")+1])
 
 # TODO: добавить add, remove, rename, rewrite idea
 # добавить название языка в waybar, nvim
