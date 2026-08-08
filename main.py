@@ -75,7 +75,7 @@ def clear_num(num_str): # WARN: FFP
 
 # TODO: добавить триграммы в search & remove 
 
-def remove_idea_by_date(date=False, time=False): # WARN: сделать поддержку 2026-08-04 и 13:59 а не только 20260804 и 1359
+def remove_idea_by_date(date=False, time=False):
     
     if date: date = clear_num(date)
     if time: time = clear_num(time)
@@ -115,8 +115,12 @@ def remove_idea_by_date(date=False, time=False): # WARN: сделать подд
             print(f"  {i+1}. {date_coincidences} {time_coincidences} [{coincidences[i][14:-3]}]")
 
         print("-"*30)
-        answer = int(input(f"Enter number to delete (1-{len(coincidences)}, or 0 to cancel): "))
-        # WARN: добавить проверку на число
+        try:
+            answer = int(input(f"Enter number to delete (1-{len(coincidences)}, or 0 to cancel): "))
+        except ValueError:
+            print("E: Incorrect number")
+            print("Cancellation...")
+            answer = 0
         if answer != 0:
             if warning(delete_idea_ask):
                 print("Deleting idea...")
