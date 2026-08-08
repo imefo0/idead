@@ -66,7 +66,9 @@ def warning(msg): # y, yes?, yn -> yes? [yn] y -> True
 # TODO: добаввить функцию предупреждения чтобы можно было ее отключить через переменную auto_yes или choice_warning
 # TODO: добавить город в метаданные идей
 
-def remove_idea_by_date(date=False, time=False):
+# TODO: добавить триграммы в search & remove 
+
+def remove_idea_by_date(date=False, time=False): # WARN: сделать поддержку 2026-08-04 и 13:59 а не только 20260804 и 1359
     
     coincidences = []
     for i in get_list_of_files(folder_ideas): # i202608041359_dd0cd3.md -> i 2026-08-04 13:59 _ dd0cd3 .md
@@ -130,12 +132,50 @@ def remove_idea_by_uuid(uuid_):
             (folder_ideas / coincidences[0]).unlink()
 
 def remove_idea_by_name(name):
-    pass
+
+    coincidences = []
+    for i in get_list_of_files(folder_ideas): # i202608041359_dd0cd3.md -> i 2026-08-04 13:59 _ dd0cd3 .md
+        # print((folder_ideas / i).read_text().splitlines()[1])
+        if (folder_ideas / i).read_text().splitlines()[1][6:] == name:
+            coincidences.append(i)
+
+    if len(coincidences) == 0: # нет идей
+        # TODO: добавить класс Error и добавить эту ошибку как Error.NoMatchesFound
+        # TODO: добавить класс Error и добавить ошибку Error.IncorrectDate / IncorrectInput
+        print("E: No Matches Found")
+
+    elif len(coincidences) == 1:
+        # TODO: добавить так чтобы была понятна какая идея удаляется
+
+        if warning(delete_idea_ask):
+            print("Deleting idea...")
+            (folder_ideas / coincidences[0]).unlink()
+
+    else: # много идей
+        # TODO: добавить удаление нескольких идей сразу
+
+        print(f"Found {len(coincidences)} ideas for {name}:")
+        print("-"*30) # TODO: добавить переменную для этого числа (30)
+        for i in range(len(coincidences)): # i202608041359_dd0cd3 -> i 20260804 1359 _dd0cd3
+            date_coincidences = f"{coincidences[i][1:5]}-{coincidences[i][5:7]}-{coincidences[i][7:9]}"
+            time_coincidences = f"{coincidences[i][9:11]}:{coincidences[i][11:13]}"
+            print(f"  {i+1}. {date_coincidences} {time_coincidences} [{coincidences[i][14:-3]}]")
+
+        print("-"*30)
+        answer = int(input(f"Enter number to delete (1-{len(coincidences)}, or 0 to cancel): "))
+        # WARN: добавить проверку на число
+        if answer != 0:
+            if warning(delete_idea_ask):
+                print("Deleting idea...")
+                (folder_ideas / coincidences[answer-1]).unlink()
+
 
 def remove_idea_by_custom_metadata(): pass
 
 
 def main():
+    # TODO: добавить переменные для обозначения флагов
+    # TODO: добавить поддержку удаления идеи сразу с несколькими флагами
     if len(command) > 0:
         if command[0] == "init":
             init()
