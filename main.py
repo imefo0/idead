@@ -106,8 +106,7 @@ def remove_idea_by_date(date=False, time=False):
         answer = int(input(f"Enter number to delete (1-{len(coincidences)}, or 0 to cancel): "))
         # WARN: добавить проверку на число
         if answer != 0:
-            new_answer = input("Are you sure you want to delete this idea? [yn] ")
-            if new_answer.lower() in ["y", "yes"]: # TODO: вынести список из y и yes в отдельную переменную для конфига
+            if warning(delete_idea_ask):
                 print("Deleting idea...")
                 (folder_ideas / coincidences[answer-1]).unlink()
 
