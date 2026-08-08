@@ -1,5 +1,6 @@
 from pathlib import Path
 from config import *
+from datetime import datetime
 
 # TODO: добавить город в метаданные идей и имя пользователя
 # TODO: добавить триграммы в search & remove
