@@ -67,9 +67,7 @@ def warning(msg): # y, yes?, yn -> yes? [yn] y -> True
 # TODO: добавить город в метаданные идей
 
 def remove_idea_by_date(date=False, time=False):
-    # WARN: код повторяется
-
-    # if not time: # только по дате
+    
     coincidences = []
     for i in get_list_of_files(folder_ideas): # i202608041359_dd0cd3.md -> i 2026-08-04 13:59 _ dd0cd3 .md
         if not time:
