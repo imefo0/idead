@@ -24,6 +24,9 @@ ideas_format = "md"
 
 warning_choice = True
 
+separator_length = 30
+separator_symbol = "-"
+
 delete_idea_ask = "Are you sure you want to delete this idea?"
 
 def init():
@@ -98,7 +101,7 @@ def remove_idea_by_date(date=False, time=False): # WARN: сделать подд
         # TODO: добавить удаление нескольких идей сразу
 
         print(f"Found {len(coincidences)} ideas for{f" {date[:4]}-{date[4:6]}-{date[6:8]}" if date else ""}{f" {time[:2]}:{time[2:]}" if time else ""}:")
-        print("-"*30) # TODO: добавить переменную для этого числа (30)
+        print(separator_symbol * separator_length)
         for i in range(len(coincidences)): # i202608041359_dd0cd3 -> i 20260804 1359 _dd0cd3
             date_coincidences = f"{coincidences[i][1:5]}-{coincidences[i][5:7]}-{coincidences[i][7:9]}"
             time_coincidences = f"{coincidences[i][9:11]}:{coincidences[i][11:13]}"
@@ -155,7 +158,7 @@ def remove_idea_by_name(name):
         # TODO: добавить удаление нескольких идей сразу
 
         print(f"Found {len(coincidences)} ideas for {name}:")
-        print("-"*30) # TODO: добавить переменную для этого числа (30)
+        print(separator_symbol * separator_length)
         for i in range(len(coincidences)): # i202608041359_dd0cd3 -> i 20260804 1359 _dd0cd3
             date_coincidences = f"{coincidences[i][1:5]}-{coincidences[i][5:7]}-{coincidences[i][7:9]}"
             time_coincidences = f"{coincidences[i][9:11]}:{coincidences[i][11:13]}"
