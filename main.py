@@ -144,12 +144,16 @@ def main():
                 new_idea(command[2], command[3])
         elif command[0] == "remove":
             if command[1] == "idea":
-                if "--date" in command[2:] and "--time" in command[2:]:
-                    remove_idea_by_date(command[command.index("--date")+1], command[command.index("--time")+1])
-                elif "--date" in command[2:]:
-                    remove_idea_by_date(date=command[command.index("--date")+1])
-                elif "--time" in command[2:]:
-                    remove_idea_by_date(time=command[command.index("--time")+1])
+                if "--date" in command[2:] or "--time" in command[2:]:
+                    if "--date" in command[2:] and "--time" in command[2:]:
+                        remove_idea_by_date(command[command.index("--date")+1], command[command.index("--time")+1])
+                    elif "--date" in command[2:]:
+                        remove_idea_by_date(date=command[command.index("--date")+1])
+                    elif "--time" in command[2:]:
+                        remove_idea_by_date(time=command[command.index("--time")+1])
+                else:
+                    if "--uuid" in command[2:]:
+                        remove_idea_by_uuid(command[command.index("--uuid")+1])
 
 # TODO: добавить add, remove, rename, rewrite idea
 # добавить название языка в waybar, nvim
