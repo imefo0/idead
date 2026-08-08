@@ -66,6 +66,10 @@ def warning(msg): # y, yes?, yn -> yes? [yn] y -> True
             return False
     return True
 
+def clear_num(num_str): # WARN: FFP
+    return ''.join(filter(str.isdigit, num_str))
+
+
 # TODO: добаввить функцию предупреждения чтобы можно было ее отключить через переменную auto_yes или choice_warning
 # TODO: добавить город в метаданные идей
 
@@ -73,6 +77,9 @@ def warning(msg): # y, yes?, yn -> yes? [yn] y -> True
 
 def remove_idea_by_date(date=False, time=False): # WARN: сделать поддержку 2026-08-04 и 13:59 а не только 20260804 и 1359
     
+    if date: date = clear_num(date)
+    if time: time = clear_num(time)
+
     coincidences = []
     for i in get_list_of_files(folder_ideas): # i202608041359_dd0cd3.md -> i 2026-08-04 13:59 _ dd0cd3 .md
         if not time:
