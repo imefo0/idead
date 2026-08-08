@@ -1,36 +1,36 @@
-import os
-import subprocess
 from pathlib import Path
 import sys
-
-home = Path.home()
-
-# XDG folders
-folder_config = home / ".config" / "idead"
-folder_data = home / ".local" / "share" / "idead"
-folder_cache = home / ".cache" / "idead"
-
-# Other folders
-folder_ideas = folder_data / "ideas"
-folder_posts = folder_data / "posts"
-folder_tasks = folder_data / "tasks"
-folder_guides = folder_data / "guides"
+from datetime import datetime # now = datetime.now().strftime("%Y-%m-%d %H:%M")
+import uuid
+from config import *
+from ideas import *
 
 command = sys.argv[1:]
 
-def init():
-    folder_config.mkdir(parents=True, exist_ok=True)
-    folder_data.mkdir(parents=True, exist_ok=True)
-    folder_cache.mkdir(parents=True, exist_ok=True)
-
-    folder_ideas.mkdir(parents=True, exist_ok=True)
-    folder_posts.mkdir(parents=True, exist_ok=True)
-    folder_tasks.mkdir(parents=True, exist_ok=True)
-    folder_guides.mkdir(parents=True, exist_ok=True)
-
 def main():
-    if command[0] == "init":
-        init()
+    # TODO: добавить переменные для обозначения флагов
+    # TODO: добавить поддержку удаления идеи сразу с несколькими флагами
+    if len(command) > 0:
+        if command[0] == "init":
+            init()
+        elif command[0] == "new":
+            if command[1] == "idea":
+                new_idea(command[2], command[3])
+        elif command[0] == "remove":
+            if command[1] == "idea":
+                if "--date" in command[2:] or "--time" in command[2:]:
+                    if "--date" in command[2:] and "--time" in command[2:]:
+                        remove_idea_by_date(command[command.index("--date")+1], command[command.index("--time")+1])
+                    elif "--date" in command[2:]:
+                        remove_idea_by_date(date=command[command.index("--date")+1])
+                    elif "--time" in command[2:]:
+                        remove_idea_by_date(time=command[command.index("--time")+1])
+                else:
+                    if "--uuid" in command[2:]:
+                        remove_idea_by_uuid(command[command.index("--uuid")+1])
+
+# TODO: добавить add, remove, rename, rewrite idea
+# добавить поддержку версий и для идей
 
 if __name__ == "__main__":
     main()
