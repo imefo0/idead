@@ -166,7 +166,11 @@ def list_ideas():
     # TODO: добавить выравнивание
     # WARN: refactor
     ideas = _get_list_of_files(folder_ideas)
-    
+
+    if not ideas:
+        print("E: No Ideas Found")
+        return
+
     print(" №     date    time   uuid  ver    name")
     print(separator_symbol * separator_length)
     num = 1
