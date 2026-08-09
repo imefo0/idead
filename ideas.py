@@ -1,5 +1,7 @@
 from pathlib import Path
 from config import *
+from datetime import datetime
+import uuid
 
 # TODO: добавить город в метаданные идей и имя пользователя
 # TODO: добавить триграммы в search & remove
@@ -41,7 +43,7 @@ def new_idea(name, desc):
     time_now_mini = now = datetime.now().strftime("%Y%m%d%H%M")
 
     uuid12 = uuid.uuid4().hex[:6]
-    content = f"---\nname: {name}\ncreate_time: {time_now}\nuuid: {uuid12}\nversion: {idea_version}\n---\n{desc}"
+    content = f"---\nname: {name}\ndate: {time_now}\nuuid: {uuid12}\nversion: {ideas_version}\n---\n{desc}"
 
     (folder_ideas / f"i{time_now_mini}_{uuid12}.md").write_text(content)
 
@@ -160,3 +162,28 @@ def remove_idea_by_name(name):
 
 def remove_idea_by_custom_metadata(): pass
 
+def list_ideas():
+    # TODO: добавить выравнивание
+    # WARN: refactor
+    ideas = _get_list_of_files(folder_ideas)
+
+    if not ideas:
+        print("E: No Ideas Found")
+        return
+
+    print(" №     date    time   uuid  ver    name")
+    print(separator_symbol * separator_length)
+    num = 1
+    for i in ideas:
+        data = (folder_ideas / i).read_text().splitlines()
+        #print(data)
+        #      1. 2026-08-08 11:44 20d2aa 1.0 text
+        print(f"{num if num >= 10 else f" {num}"}. ", end="")
+        print(f"{data[2][6:] if any("date" in line for line in data) else "????-??-?? ??:??"}", end=" ")
+        print(f"{f"{data[3][6:]}" if any("uuid" in line for line in data) else "??????"}", end=" ")
+        print(f"{f"{data[4][9:12]}" if any("version" in line for line in data) else "?.?"}", end=" ")
+        print(f"{f"{data[1][6:16]}" if any("name" in line for line in data) else "??????????"}{"..." if len(data[1][6:]) >= 10 else ""}")
+
+        num += 1
+
+    print(separator_symbol * separator_length)
