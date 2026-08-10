@@ -164,6 +164,7 @@ def remove_idea_by_custom_metadata(): pass
 
 def list_ideas():
     # TODO: добавить выравнивание
+    # TODO: добавить проверку даты и uuid в названии файла а не только в метаданных
     # WARN: refactor
     ideas = _get_list_of_files(folder_ideas)
 
