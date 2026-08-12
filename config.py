@@ -26,6 +26,40 @@ delete_idea_ask = "Are you sure you want to delete this idea?"
 
 ideas_version = "1.0"
 
+data = {
+    # "paths": {
+        # "unnamed": "unnamed",
+        # "home": f"/home/unnamed"
+        # "config": "{paths.home}/.config/idead",
+        # "data": "{paths.home}/.local/share/idead",
+        # "cache": "{paths.home}/.cache/idead/",
+        # "ideas": "{paths.data}/idead/ideas",
+        # "posts": "{paths.data}/idead/posts",
+        # "tasks": "{paths.data}/idead/tasks",
+        # "guides": "{paths.data}/idead/guides"
+    # },
+    "settings": {
+        "all": {
+            "warning_choice": True,
+            "separator_length": 30,
+            "separator_symbol": "-"
+        },
+        "ideas": {
+            "version": "1.0",
+            "format": "md"
+        },
+    },
+    "warnings": {
+        "ideas": {
+            "delete": "Are you sure you want to delete this idea?"
+        }
+    },
+    "config": {
+        "version": "1.1",
+        # "name": "config.json"
+    }
+}
+
 def resolve_templates(obj, context=None):
     if context is None:
         context = obj
@@ -67,45 +101,16 @@ def resolve_templates(obj, context=None):
     else:
         return obj
 
-def reset_settings():
-    data = {
-        "paths": {
-            "home": f"/home/imefo",
-            "config": "{paths.home}/.config/idead",
-            "data": "{paths.home}/.local/share/idead",
-            "cache": "{paths.home}/.cache/idead/",
-            "ideas": "{paths.data}/idead/ideas",
-            "posts": "{paths.data}/idead/posts",
-            "tasks": "{paths.data}/idead/tasks",
-            "guides": "{paths.data}/idead/guides"
-        },
-        "settings": {
-            "all": {
-                "warning_choice": True,
-                "separator_length": 30,
-                "separator_symbol": "-"
-            },
-            "ideas": {
-                "version": "1.0",
-                "format": "md"
-            },
-        },
-        "warnings": {
-            "ideas": {
-                "delete": "Are you sure you want to delete this idea?"
-            }
-        },
-        "config": {
-            "version": "1.0",
-            "name": "config.json"
-        }
-    }
+def get():
+    with open (folder_config / "config.json") as f:
+        return json.load(f)
 
+def reset_settings():
     # INFO: функция проходит по data и меняет {a.b.c.d} на настоящие имена
     resolved = resolve_templates(data)
 
     # INFO: берем путь из resolved:paths.config (написал в кратком виде) и файл resolved.config.name
-    config_path = Path(resolved["paths"]["config"]) / resolved["config"]["name"]
+    config_path = folder_config / "config.json"
 
     # INFO: создает папки если их нет
     config_path.parent.mkdir(parents=True, exist_ok=True)
