@@ -15,6 +15,7 @@ folder_posts = folder_data / "posts"
 folder_tasks = folder_data / "tasks"
 folder_guides = folder_data / "guides"
 
+# TODO: убрать это
 ideas_format = "md"
 
 warning_choice = True
@@ -26,6 +27,7 @@ delete_idea_ask = "Are you sure you want to delete this idea?"
 
 ideas_version = "1.0"
 
+# TODO: переместить data в файл внутри проекта
 data = {
     # "paths": {
         # "unnamed": "unnamed",
