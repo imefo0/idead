@@ -2,7 +2,7 @@
     "settings": {
         "all": {
             "warning_choice": true,
-            "separator_length": 30,
+            "separator_length": 45,
             "separator_symbol": "-"
         },
         "ideas": {

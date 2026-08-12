@@ -3,6 +3,8 @@ from config import *
 from datetime import datetime
 import uuid
 
+data = get()
+
 # TODO: добавить город в метаданные идей и имя пользователя
 # TODO: добавить триграммы в search & remove
 
@@ -16,7 +18,7 @@ def _get_list_of_files(folder):
     return files
 
 def _warning(msg): # y, yes?, yn -> yes? [yn] y -> True
-    if warning_choice:
+    if data["settings"]["all"]["warning_choice"]:
         answer = input(f"{msg} [yn] ")
         if answer.lower() in ["y", "yes"]:
             return True
@@ -39,11 +41,12 @@ def init():
     folder_guides.mkdir(parents=True, exist_ok=True)
 
 def new_idea(name, desc):
+    # TODO: добавит в config формат даты
     time_now = datetime.now().strftime("%Y-%m-%d %H:%M")
     time_now_mini = now = datetime.now().strftime("%Y%m%d%H%M")
 
     uuid12 = uuid.uuid4().hex[:6]
-    content = f"---\nname: {name}\ndate: {time_now}\nuuid: {uuid12}\nversion: {ideas_version}\n---\n{desc}"
+    content = f"---\nname: {name}\ndate: {time_now}\nuuid: {uuid12}\nversion: {data["settings"]["ideas"]["version"]}\n---\n{desc}"
 
     (folder_ideas / f"i{time_now_mini}_{uuid12}.md").write_text(content)
 
@@ -72,15 +75,16 @@ def remove_idea_by_date(date=False, time=False):
 
     elif len(coincidences) == 1:
         # TODO: добавить так чтобы была понятна какая идея удаляется
-
-        if _warning(delete_idea_ask):
+        
+        # TODO: переместить data["warnings"]["ideas"]["delete"] в config
+        if _warning(data["warnings"]["ideas"]["delete"]):
             print("Deleting idea...")
             (folder_ideas / coincidences[0]).unlink()
     else: # много идей
         # TODO: добавить удаление нескольких идей сразу
 
         print(f"Found {len(coincidences)} ideas for{f" {date[:4]}-{date[4:6]}-{date[6:8]}" if date else ""}{f" {time[:2]}:{time[2:]}" if time else ""}:")
-        print(separator_symbol * separator_length)
+        print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])
         for i in range(len(coincidences)): # i202608041359_dd0cd3 -> i 20260804 1359 _dd0cd3
             date_coincidences = f"{coincidences[i][1:5]}-{coincidences[i][5:7]}-{coincidences[i][7:9]}"
             time_coincidences = f"{coincidences[i][9:11]}:{coincidences[i][11:13]}"
@@ -88,13 +92,14 @@ def remove_idea_by_date(date=False, time=False):
 
         print("-"*30)
         try:
+            # TODO: переместить в config
             answer = int(input(f"Enter number to delete (1-{len(coincidences)}, or 0 to cancel): "))
         except ValueError:
             print("E: Incorrect number")
             print("Cancellation...")
             answer = 0
         if answer != 0:
-            if _warning(delete_idea_ask):
+            if _warning(data["warnings"]["ideas"]["delete"]):
                 print("Deleting idea...")
                 (folder_ideas / coincidences[answer-1]).unlink()
 
@@ -113,7 +118,7 @@ def remove_idea_by_uuid(uuid_):
     elif len(coincidences) == 1:
         # TODO: добавить так чтобы была понятна какая идея удаляется
 
-        if _warning(delete_idea_ask):
+        if _warning(data["warnings"]["ideas"]["delete"]):
             print("Deleting idea...")
             (folder_ideas / coincidences[0]).unlink()
 
@@ -133,7 +138,7 @@ def remove_idea_by_name(name):
     elif len(coincidences) == 1:
         # TODO: добавить так чтобы была понятна какая идея удаляется
 
-        if _warning(delete_idea_ask):
+        if _warning(data["warnings"]["ideas"]["delete"]):
             print("Deleting idea...")
             (folder_ideas / coincidences[0]).unlink()
 
@@ -141,7 +146,7 @@ def remove_idea_by_name(name):
         # TODO: добавить удаление нескольких идей сразу
 
         print(f"Found {len(coincidences)} ideas for {name}:")
-        print(separator_symbol * separator_length)
+        print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])
         for i in range(len(coincidences)): # i202608041359_dd0cd3 -> i 20260804 1359 _dd0cd3
             date_coincidences = f"{coincidences[i][1:5]}-{coincidences[i][5:7]}-{coincidences[i][7:9]}"
             time_coincidences = f"{coincidences[i][9:11]}:{coincidences[i][11:13]}"
@@ -156,7 +161,7 @@ def remove_idea_by_name(name):
             answer = 0
 
         if answer != 0:
-            if _warning(delete_idea_ask):
+            if _warning(data["warnings"]["ideas"]["delete"]):
                 print("Deleting idea...")
                 (folder_ideas / coincidences[answer-1]).unlink()
 
@@ -173,18 +178,18 @@ def list_ideas():
         return
 
     print(" №     date    time   uuid  ver    name")
-    print(separator_symbol * separator_length)
+    print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])
     num = 1
     for i in ideas:
-        data = (folder_ideas / i).read_text().splitlines()
+        info = (folder_ideas / i).read_text().splitlines()
         #print(data)
         #      1. 2026-08-08 11:44 20d2aa 1.0 text
         print(f"{num if num >= 10 else f" {num}"}. ", end="")
-        print(f"{data[2][6:] if any("date" in line for line in data) else "????-??-?? ??:??"}", end=" ")
-        print(f"{f"{data[3][6:]}" if any("uuid" in line for line in data) else "??????"}", end=" ")
-        print(f"{f"{data[4][9:12]}" if any("version" in line for line in data) else "?.?"}", end=" ")
-        print(f"{f"{data[1][6:16]}" if any("name" in line for line in data) else "??????????"}{"..." if len(data[1][6:]) >= 10 else ""}")
+        print(f"{info[2][6:] if any("date" in line for line in info) else "????-??-?? ??:??"}", end=" ")
+        print(f"{f"{info[3][6:]}" if any("uuid" in line for line in info) else "??????"}", end=" ")
+        print(f"{f"{info[4][9:12]}" if any("version" in line for line in info) else "?.?"}", end=" ")
+        print(f"{f"{info[1][6:16]}" if any("name" in line for line in info) else "??????????"}{"..." if len(info[1][6:]) >= 10 else ""}")
 
         num += 1
 
-    print(separator_symbol * separator_length)
+    print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])

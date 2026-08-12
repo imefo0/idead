@@ -20,18 +20,6 @@ folder_posts = folder_data / "posts"
 folder_tasks = folder_data / "tasks"
 folder_guides = folder_data / "guides"
 
-# TODO: убрать это, до v0.4.0
-ideas_format = "md"
-
-warning_choice = True
-
-separator_length = 30
-separator_symbol = "-"
-
-delete_idea_ask = "Are you sure you want to delete this idea?"
-
-ideas_version = "1.0"
-
 def resolve_templates(obj, context=None):
     if context is None:
         context = obj
@@ -103,7 +91,6 @@ def set(config_path, value):
         data = json.load(f)
 
     path = config_path.split(".")
-
 
     if get_nested(data, path) is not None:
         data = set_nested(data, path, value)

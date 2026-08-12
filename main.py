@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from pathlib import Path
 import sys
 from datetime import datetime # now = datetime.now().strftime("%Y-%m-%d %H:%M")
