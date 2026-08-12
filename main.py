@@ -42,7 +42,8 @@ def main():
                 set(command[1], command[3])
             elif command[2] == "get":
                 get_value(command[1])
-            # TODO: добавить config path get
+            elif command[2] == "reset":
+                reset_value(command[1])
             # TODO: добавить config reset path
 
 

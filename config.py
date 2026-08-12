@@ -112,6 +112,20 @@ def get_value(config_path):
     else:
         print("E: No Path Found")
 
+def reset_value(config_path):
+    with open((folder_config / "config.json"), "r") as f:
+        data = json.load(f)
+    with open((Path(__file__).parent / "default_config.json"), "r") as f:
+        default_data = json.load(f)
+
+    path = config_path.split(".")
+    value = get_nested(data, path)
+    if value is not None:
+        with open((folder_config / "config.json"), "w") as f:
+            json.dump(set_nested(data, path, get_nested(default_data, path)), f, indent=4, ensure_ascii=False)
+    else:
+        print("E: No Path Found")
+
 
 def update():
     updater.main()
