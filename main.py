@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from pathlib import Path
 import sys
 from datetime import datetime # now = datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -6,6 +8,10 @@ from config import *
 from ideas import *
 
 command = sys.argv[1:]
+
+# TODO: добавить --help
+# TODO: добавить use: ... в каждую команду
+# TODO: добавить update.idea.update
 
 def main():
     # TODO: добавить переменные для обозначения флагов
@@ -31,6 +37,18 @@ def main():
         elif command[0] == "list":
             if command[1] == "idea":
                 list_ideas()
+        elif command[0] == "config":
+            if command[1] == "reset":
+                reset_settings()
+            elif command[1] == "update":
+                update()
+            elif command[2] == "set": # WARN: если не будет значения после set то вернуть ошибку: E: Value Not Entered
+                set(command[1], command[3])
+            elif command[2] == "get":
+                get_value(command[1])
+            elif command[2] == "reset":
+                reset_value(command[1])
+
 
 # TODO: добавить add, remove, rename, rewrite idea
 # добавить поддержку версий и для идей
