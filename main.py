@@ -34,6 +34,13 @@ def main():
         elif command[0] == "config":
             if command[1] == "reset":
                 reset_settings()
+            elif command[1] == "update":
+                update()
+            elif command[2] == "set": # WARN: если не будет значения после set то вернуть ошибку: E: Value Not Entered
+                set(command[1], command[3])
+            # TODO: добавить config path get
+            # TODO: добавить config reset path
+
 
 # TODO: добавить add, remove, rename, rewrite idea
 # добавить поддержку версий и для идей

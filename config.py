@@ -1,6 +1,11 @@
 from pathlib import Path
 import json
 import re
+import subprocess
+import glob
+import update.config.update as updater
+
+# WARN: изменить везде пути на переменные
 
 home = Path.home()
 
@@ -15,7 +20,7 @@ folder_posts = folder_data / "posts"
 folder_tasks = folder_data / "tasks"
 folder_guides = folder_data / "guides"
 
-# TODO: убрать это
+# TODO: убрать это, до v0.4.0
 ideas_format = "md"
 
 warning_choice = True
@@ -69,8 +74,47 @@ def resolve_templates(obj, context=None):
         return obj
 
 def get():
-    with open (folder_config / "config.json") as f:
+    with open(folder_config / "config.json", "r") as f:
         return json.load(f)
+
+def get_nested(data, keys, default=None): # возвращает default если пути нет в словаре
+    current = data
+
+    for key in keys:
+        if isinstance(current, dict) and key in current:
+            current = current[key]
+        else:
+            return default
+    return current
+
+def set_nested(data, keys, value): # ставит значение value в пути, если не существует путь, создает его
+    current = data
+
+    for key in keys[:-1]:
+        if key not in current or not isinstance(current[key], dict):
+            current[key] = {}
+        current = current[key]
+
+    current[keys[-1]] = value
+    return data
+
+def set(config_path, value):
+    with open((folder_config / "config.json"), "r") as f:
+        data = json.load(f)
+
+    path = config_path.split(".")
+
+
+    if get_nested(data, path) is not None:
+        data = set_nested(data, path, value)
+    else:
+        print("E: No Path Found")
+
+    with open((folder_config / "config.json"), "w") as f:
+        json.dump(data, f, indent=4, ensure_ascii=False)
+
+def update():
+    updater.main()
 
 def reset_settings():
     # INFO: открываем файл default_config.json и перемещаем в data
@@ -89,7 +133,6 @@ def reset_settings():
     with open(config_path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
 
-    print("ok")
 
 def load_config():
     pass

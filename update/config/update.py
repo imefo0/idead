@@ -23,25 +23,26 @@ def update_from(old_version) -> (bool, str):
         return (False, "")
     return (True, glob.glob(f"{Path(__file__).parent}/{old_version}_to_*.py")[0].split("_to_")[1].replace(".py", ""))
 
-# WARN: кидать ошибку если нет data.config.version
-with open((Path.home() / ".config" / "idead" / "config.json"), "r") as f:
-    current_version = json.load(f)["config"]["version"]
+def main():
+    # WARN: кидать ошибку если нет data.config.version
+    with open((Path.home() / ".config" / "idead" / "config.json"), "r") as f:
+        current_version = json.load(f)["config"]["version"]
 
-with open((Path(__file__).parent.parent.parent / "default_config.json"), "r") as f:
-    actual_version = json.load(f)["config"]["version"]
+    with open((Path(__file__).parent.parent.parent / "default_config.json"), "r") as f:
+        actual_version = json.load(f)["config"]["version"]
 
-if is_older_version(actual_version, current_version): # если версия пользователя старше чем актуальная
-    print(f"Update required: {current_version} -> {actual_version}")
+    if is_older_version(actual_version, current_version): # если версия пользователя старше чем актуальная
+        print(f"Update required: {current_version} -> {actual_version}")
 
-    if input("Update? [yn] ") == "y":
+        if input("Update? [yn] ") == "y":
 
-        while is_older_version(actual_version, current_version):
-            result = update_from(current_version)
-            current_version = result[1]
-            if not result[0]:
-                print("E: Not Update File Found")
-                sys.exit(0)
+            while is_older_version(actual_version, current_version):
+                result = update_from(current_version)
+                current_version = result[1]
+                if not result[0]:
+                    print("E: Not Update File Found")
+                    sys.exit(0)
 
-        print(f"Successful update! Current version: {current_version}")
-else:
-    print("Config version is up to date")
+            print(f"Successful update! Current version: {current_version}")
+    else:
+        print("Config version is up to date")
