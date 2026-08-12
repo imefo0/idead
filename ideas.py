@@ -90,7 +90,7 @@ def remove_idea_by_date(date=False, time=False):
             time_coincidences = f"{coincidences[i][9:11]}:{coincidences[i][11:13]}"
             print(f"  {i+1}. {date_coincidences} {time_coincidences} [{coincidences[i][14:-3]}]")
 
-        print("-"*30)
+        print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])
         try:
             # TODO: переместить в config
             answer = int(input(f"Enter number to delete (1-{len(coincidences)}, or 0 to cancel): "))
