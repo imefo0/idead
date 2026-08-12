@@ -40,6 +40,8 @@ def main():
                 update()
             elif command[2] == "set": # WARN: если не будет значения после set то вернуть ошибку: E: Value Not Entered
                 set(command[1], command[3])
+            elif command[2] == "get":
+                get_value(command[1])
             # TODO: добавить config path get
             # TODO: добавить config reset path
 

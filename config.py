@@ -100,6 +100,19 @@ def set(config_path, value):
     with open((folder_config / "config.json"), "w") as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
 
+def get_value(config_path):
+    with open((folder_config / "config.json"), "r") as f:
+        data = json.load(f)
+
+    path = config_path.split(".")
+    value = get_nested(data, path)
+    if value is not None:
+        # TODO: изменить формат вывода
+        print(value)
+    else:
+        print("E: No Path Found")
+
+
 def update():
     updater.main()
 
