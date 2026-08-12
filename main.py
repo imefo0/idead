@@ -9,6 +9,10 @@ from ideas import *
 
 command = sys.argv[1:]
 
+# TODO: добавить --help
+# TODO: добавить use: ... в каждую команду
+# TODO: добавить update.idea.update
+
 def main():
     # TODO: добавить переменные для обозначения флагов
     # TODO: добавить поддержку удаления идеи сразу с несколькими флагами
@@ -44,7 +48,6 @@ def main():
                 get_value(command[1])
             elif command[2] == "reset":
                 reset_value(command[1])
-            # TODO: добавить config reset path
 
 
 # TODO: добавить add, remove, rename, rewrite idea
