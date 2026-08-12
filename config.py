@@ -27,41 +27,6 @@ delete_idea_ask = "Are you sure you want to delete this idea?"
 
 ideas_version = "1.0"
 
-# TODO: переместить data в файл внутри проекта
-data = {
-    # "paths": {
-        # "unnamed": "unnamed",
-        # "home": f"/home/unnamed"
-        # "config": "{paths.home}/.config/idead",
-        # "data": "{paths.home}/.local/share/idead",
-        # "cache": "{paths.home}/.cache/idead/",
-        # "ideas": "{paths.data}/idead/ideas",
-        # "posts": "{paths.data}/idead/posts",
-        # "tasks": "{paths.data}/idead/tasks",
-        # "guides": "{paths.data}/idead/guides"
-    # },
-    "settings": {
-        "all": {
-            "warning_choice": True,
-            "separator_length": 30,
-            "separator_symbol": "-"
-        },
-        "ideas": {
-            "version": "1.0",
-            "format": "md"
-        },
-    },
-    "warnings": {
-        "ideas": {
-            "delete": "Are you sure you want to delete this idea?"
-        }
-    },
-    "config": {
-        "version": "1.1",
-        # "name": "config.json"
-    }
-}
-
 def resolve_templates(obj, context=None):
     if context is None:
         context = obj
@@ -108,6 +73,10 @@ def get():
         return json.load(f)
 
 def reset_settings():
+    # INFO: открываем файл default_config.json и перемещаем в data
+    with open((Path(__file__).parent / "default_config.json"), "r") as f:
+        data = json.load(f)
+
     # INFO: функция проходит по data и меняет {a.b.c.d} на настоящие имена
     resolved = resolve_templates(data)
 

@@ -1,9 +1,9 @@
 from pathlib import Path
 import json
+import core
 # удаляет paths.* и config.name
 
-with open((Path.home() / ".config" / "idead" / "config.json"), "r") as f:
-    data = json.load(f)
+data = core.load()
 
 # INFO: проверяем есть ли paths:
 if "paths" in data:
@@ -16,8 +16,7 @@ if "config" in data and "name" in data["config"]:
 # INFO: меняем версию
 data["config"]["version"] = "1.1"
 
-with open((Path.home() / ".config" / "idead" / "config.json"), "w") as f:
-    json.dump(data, f, indent=4)
+core.save(data)
 
 print("1.0 -> 1.1:")
 print("- rm: paths.*")
