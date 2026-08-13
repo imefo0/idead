@@ -167,6 +167,22 @@ def remove_idea_by_name(name):
 
 def remove_idea_by_custom_metadata(): pass
 
+def _to_trigram(text):
+    # hello -> hel ell llo -> 5 | 3
+    # 1234567890 -> 123 234 345 456 567 678 789 890  -> 10 | 8
+    # abcd -> abc bcd -> 4 | 2
+    # abc -> abc -> 3 | 1
+    # ab -> ab -> 2| 1
+    # hello! how are you? -> hel ell llo lo! o!  ! h  ow how ow  w a ..
+    # ab 0+2 = 2 == 2? true -> 
+    new_text = []
+    if len(text) - 2 <= 0:
+        new_text.append(text)
+    else:
+        for i in range(len(text) - 2):
+            new_text.append(text[i:i+3])
+    return new_text
+
 def list_ideas():
     # TODO: добавить выравнивание
     # TODO: добавить проверку даты и uuid в названии файла а не только в метаданных
