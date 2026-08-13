@@ -225,16 +225,18 @@ def search_idea(text): # TODO: добавить поиск только по и�
         info = (folder_ideas / i).read_text().splitlines()[1][6:]
         variants.append(info)
 
+    max_number = data["settings"]["ideas"]["search"]["max_results"]
+
     # сделать поиск
     search_status = _trigram_search(text, variants)
     # вывести результаты
     number = 1
-    print(f"№. value    date        name")
+    print(f"{" "*(len(str(max_number))-1)}№. value    date        name")
     print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])
-    for index, status in search_status[:5]:
+    for index, status in search_status[:min(max_number, len(search_status))]:
         #       1. 0.31 2026-08-08 this is a ...
         date = ideas[index][1:9]
-        print(f"{number}. {status:.2f} {date[:4]}-{date[4:6]}-{date[6:8]} {variants[index][:10]}{"..." if len(variants[index]) >= 10 else ""}") # status:.1% -> 75.9% 
+        print(f"{number:>{len(str(min(max_number, len(search_status))))}}. {status:.2f} {date[:4]}-{date[4:6]}-{date[6:8]} {variants[index][:10]}{"..." if len(variants[index]) >= 10 else ""}") # status:.1% -> 75.9% 
         number += 1
 
 def list_ideas():
