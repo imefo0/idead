@@ -183,6 +183,20 @@ def _to_trigram(text):
             new_text.append(text[i:i+3])
     return new_text
 
+def _jaccard_similarity(text: list(str), variants: list(list(str))) -> float:
+    #print("text (ожидается триграммы):", text)
+    set_t = set(text)
+    set_v = set(variants)
+
+    if not set_t and not set_v:
+        return 1.0
+
+    intersection = len(set_t & set_v)
+
+    union = len(set_t | set_v)
+
+    return intersection / union if union != 0 else 0.0
+
 def list_ideas():
     # TODO: добавить выравнивание
     # TODO: добавить проверку даты и uuid в названии файла а не только в метаданных
