@@ -1,5 +1,3 @@
-from pathlib import Path
-import json
 import core
 # удаляет paths.* и config.name
 

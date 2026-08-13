@@ -217,9 +217,7 @@ def _trigram_search(text: str, variants: list(str)) -> tuple((int, float)): # в
 # NOTE: тут только по названию
 def search_idea(text): # TODO: добавить поиск только по имени или только по описанию
     # TODO: добавить ограничение текста в config
-    # TODO: добавить ограничение на количество результата в config
     # получить список текстов
-    # TODO: добавить список вывода в таблицу в config (например показывать только дату и имя)
     ideas = _get_list_of_files(folder_ideas)
     variants = []
     for i in ideas:
