@@ -36,6 +36,10 @@ def main():
                 else:
                     if "--uuid" in command[2:]:
                         remove_idea_by_uuid(command[command.index("--uuid")+1])
+        elif command[0] == "search":
+            if command[1] == "idea":
+                if "--name" in command[2:]:
+                    search_idea(command[command.index("--name")+1])
         elif command[0] == "list":
             if command[1] == "idea":
                 list_ideas()

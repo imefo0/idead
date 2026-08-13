@@ -213,6 +213,31 @@ def _trigram_search(text: str, variants: list(str)) -> tuple((int, float)): # в
 
     ranked.sort(key=lambda x: x[1], reverse=True)
     return ranked
+
+# NOTE: тут только по названию
+def search_idea(text): # TODO: добавить поиск только по имени или только по описанию
+    # TODO: добавить ограничение текста в config
+    # TODO: добавить ограничение на количество результата в config
+    # получить список текстов
+    # TODO: добавить список вывода в таблицу в config (например показывать только дату и имя)
+    ideas = _get_list_of_files(folder_ideas)
+    variants = []
+    for i in ideas:
+        info = (folder_ideas / i).read_text().splitlines()[1][6:]
+        variants.append(info)
+
+    # сделать поиск
+    search_status = _trigram_search(text, variants)
+    # вывести результаты
+    number = 1
+    print(f"№. value    date        name")
+    print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])
+    for index, status in search_status[:5]:
+        #       1. 0.31 2026-08-08 this is a ...
+        date = ideas[index][1:9]
+        print(f"{number}. {status:.2f} {date[:4]}-{date[4:6]}-{date[6:8]} {variants[index][:10]}{"..." if len(variants[index]) >= 10 else ""}") # status:.1% -> 75.9% 
+        number += 1
+
 def list_ideas():
     # TODO: добавить выравнивание
     # TODO: добавить проверку даты и uuid в названии файла а не только в метаданных
