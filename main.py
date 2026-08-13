@@ -12,6 +12,8 @@ command = sys.argv[1:]
 # TODO: добавить --help
 # TODO: добавить use: ... в каждую команду
 # TODO: добавить update.idea.update
+# TODO: добавить тесты
+# TODO: добавить плагины и их поддержку
 
 def main():
     # TODO: добавить переменные для обозначения флагов
@@ -43,7 +45,7 @@ def main():
             elif command[1] == "update":
                 update()
             elif command[2] == "set": # WARN: если не будет значения после set то вернуть ошибку: E: Value Not Entered
-                set(command[1], command[3])
+                set_value(command[1], command[3])
             elif command[2] == "get":
                 get_value(command[1])
             elif command[2] == "reset":
