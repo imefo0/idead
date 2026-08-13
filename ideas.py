@@ -197,6 +197,22 @@ def _jaccard_similarity(text: list(str), variants: list(list(str))) -> float:
 
     return intersection / union if union != 0 else 0.0
 
+# NOTE: конечная функция для search_idea()
+def _trigram_search(text: str, variants: list(str)) -> tuple((int, float)): # возвращает (индекс, уверенность/оценка)
+    # TODO: добавить настройку в config: отображение в процентах или в дробных числах 
+    t = _to_trigram(text)
+    v = []
+    for i in variants:
+        v.append(_to_trigram(i))
+
+    ranked = []
+
+    for idx, cand_trigrams in enumerate(v):
+        score = _jaccard_similarity(t, cand_trigrams)
+        ranked.append((idx, score))
+
+    ranked.sort(key=lambda x: x[1], reverse=True)
+    return ranked
 def list_ideas():
     # TODO: добавить выравнивание
     # TODO: добавить проверку даты и uuid в названии файла а не только в метаданных
