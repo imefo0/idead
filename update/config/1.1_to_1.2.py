@@ -1,6 +1,6 @@
 import core
 # добавляет settings.ideas.search.max_results и settings.ideas.search.table_columns
-# table_columns: number, score, date, name, desc, time
+# table_columns: number, score, date, name, desc, time, uuid
 
 data = core.load()
 

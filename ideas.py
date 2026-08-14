@@ -224,10 +224,12 @@ def search_idea(text): # TODO: добавить поиск только по и�
     ideas = _get_list_of_files(folder_ideas)
     variants = []
     descs = []
+    uuids = []
     for i in ideas:
         info = (folder_ideas / i).read_text().splitlines()[1][6:]
         variants.append(info)
         descs.append((folder_ideas / i).read_text().splitlines()[6])
+        uuids.append((folder_ideas / i).read_text().splitlines()[3])
 
     max_number = data["settings"]["ideas"]["search"]["max_results"]
 
@@ -243,6 +245,7 @@ def search_idea(text): # TODO: добавить поиск только по и�
         elif i == "name": print("    name     ", end=" ")
         elif i == "desc": print(" description ", end=" ")
         elif i == "time": print("time ", end=" ")
+        elif i == "uuid": print(" uuid ", end=" ")
     print()
 
     print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])
@@ -257,8 +260,9 @@ def search_idea(text): # TODO: добавить поиск только по и�
         date = f"{date[:4]}-{date[4:6]}-{date[6:8]}"
         name = f"{variants[index][:10]}{"..." if len(variants[index]) >= 10 else " "*(13 - len(variants[index]))}"
         desc = f"{descs[index][:10]}{"..." if len(descs[index]) >= 10 else " "*(13 - len(descs[index]))}"
-        time = ideas[index][9:13]
-        time = f"{time[0:2]}:{time[2:4]}"
+        time_t = ideas[index][9:13]
+        time_t = f"{time_t[0:2]}:{time_t[2:4]}"
+        uuid_t = f"{uuids[index][6:]}"
         #       1. 0.31 2026-08-08 this is a ...
         # status:.1% -> 75.9% 
         for i in data["settings"]["ideas"]["search"]["table_columns"]:
@@ -267,7 +271,8 @@ def search_idea(text): # TODO: добавить поиск только по и�
             elif i == "date": print(date, end=" ")
             elif i == "name": print(name, end=" ")
             elif i == "desc": print(desc, end=" ")
-            elif i == "time": print(time, end=" ")
+            elif i == "time": print(time_t, end=" ")
+            elif i == "uuid": print(uuid_t, end=" ")
         print()
         number += 1
 
