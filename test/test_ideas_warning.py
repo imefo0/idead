@@ -7,16 +7,23 @@ from io import StringIO
 from unittest.mock import patch
 
 def main():
-
     test = [
         ["y", True],
         ["n", False],
         ["c", False],
         ["yes", True],
         ["YeS", True],
-        ["Y", True]
+        ["Y", True],
+        [" yes ", True],
+        [" y e s ", True],
+        [" Y E s   ", True],
+        [" y E    s", True],
+        [" y\ne S  ", True],
+        [" y \t\t\t e s", True],
+        [" y  yy eess", False], # может и true
+        ["\t\t\tnoo\t\t\t\t\n\n\t", False],
+        ["\t\n\t\n\t\n", False]
     ]
-
     warning_choice = get()["settings"]["all"]["warning_choice"]
     if not warning_choice:
         set_value("settings.all.warning_choice", True)
@@ -38,6 +45,8 @@ def main():
     set_value("settings.all.warning_choice", warning_choice)
 
     #for i in results: print(i)
+
+    return results
 
 if __name__ == "__main__":
     main()
