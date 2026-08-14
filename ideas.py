@@ -221,9 +221,11 @@ def search_idea(text): # TODO: добавить поиск только по и�
     # получить список текстов
     ideas = _get_list_of_files(folder_ideas)
     variants = []
+    descs = []
     for i in ideas:
         info = (folder_ideas / i).read_text().splitlines()[1][6:]
         variants.append(info)
+        descs.append((folder_ideas / i).read_text().splitlines()[6])
 
     max_number = data["settings"]["ideas"]["search"]["max_results"]
 
@@ -231,12 +233,40 @@ def search_idea(text): # TODO: добавить поиск только по и�
     search_status = _trigram_search(text, variants)
     # вывести результаты
     number = 1
-    print(f"{" "*(len(str(max_number))-1)}№. value    date        name")
+
+    for i in data["settings"]["ideas"]["search"]["table_columns"]:
+        if i == "number": print(f"{" "*(len(str(min(max_number, len(search_status))))-1)}№", end=" ")
+        elif i == "score": print("scr.", end=" ")
+        elif i == "date": print("   date   ", end=" ") 
+        elif i == "name": print("    name     ", end=" ")
+        elif i == "desc": print(" description ", end=" ")
+        elif i == "time": print("time ", end=" ")
+    print()
+
     print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])
+
     for index, status in search_status[:min(max_number, len(search_status))]:
-        #       1. 0.31 2026-08-08 this is a ...
+        # TODO: добавить настройку точки после № например если стоит true то будет "1." а если false то "1" в config
+        # WARN: добавить оптимизацию чтобы считались только те данные которые нужны
+
+        n = f"{number:>{len(str(min(max_number, len(search_status))))}}"
+        score = f"{status:.2f}" # TODO: добавить вывод в процентах
         date = ideas[index][1:9]
-        print(f"{number:>{len(str(min(max_number, len(search_status))))}}. {status:.2f} {date[:4]}-{date[4:6]}-{date[6:8]} {variants[index][:10]}{"..." if len(variants[index]) >= 10 else ""}") # status:.1% -> 75.9% 
+        date = f"{date[:4]}-{date[4:6]}-{date[6:8]}"
+        name = f"{variants[index][:10]}{"..." if len(variants[index]) >= 10 else " "*(13 - len(variants[index]))}"
+        desc = f"{descs[index][:10]}{"..." if len(descs[index]) >= 10 else " "*(13 - len(descs[index]))}"
+        time = ideas[index][9:13]
+        time = f"{time[0:2]}:{time[2:4]}"
+        #       1. 0.31 2026-08-08 this is a ...
+        # status:.1% -> 75.9% 
+        for i in data["settings"]["ideas"]["search"]["table_columns"]:
+            if i == "number": print(number, end=" ")
+            elif i == "score": print(score, end=" ")
+            elif i == "date": print(date, end=" ")
+            elif i == "name": print(name, end=" ")
+            elif i == "desc": print(desc, end=" ")
+            elif i == "time": print(time, end=" ")
+        print()
         number += 1
 
 def list_ideas():

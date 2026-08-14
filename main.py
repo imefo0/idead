@@ -12,10 +12,12 @@ command = sys.argv[1:]
 
 # TODO: добавить --help
 # TODO: добавить use: ... в каждую команду
-# TODO: добавить update.idea.update
 # TODO: добавить тесты
 # TODO: добавить плагины и их поддержку
 # TODO: добавить описание ошибки и решение
+# TODO: добавить:
+#idead config settings.ideas.search.max_results 10  # set по умолчанию
+#idead config settings.ideas.search.max_results     # get по умолчанию
 
 def _parse_value(value: str, path: str):
     with open((Path(__file__).resolve().parent / "default_config.json"), "r") as f:
@@ -86,6 +88,7 @@ def main():
                 new_idea(command[2], command[3])
         elif command[0] == "remove":
             if command[1] == "idea":
+                # TODO: срочно добавить --name, Я ЗАБЫЛ
                 if "--date" in command[2:] or "--time" in command[2:]:
                     if "--date" in command[2:] and "--time" in command[2:]:
                         remove_idea_by_date(command[command.index("--date")+1], command[command.index("--time")+1])
