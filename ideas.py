@@ -43,7 +43,7 @@ def init():
 def new_idea(name, desc):
     # TODO: добавит в config формат даты
     time_now = datetime.now().strftime("%Y-%m-%d %H:%M")
-    time_now_mini = now = datetime.now().strftime("%Y%m%d%H%M")
+    time_now_mini = datetime.now().strftime("%Y%m%d%H%M")
 
     uuid12 = uuid.uuid4().hex[:6]
     content = f"---\nname: {name}\ndate: {time_now}\nuuid: {uuid12}\nversion: {data["settings"]["ideas"]["version"]}\n---\n{desc}"
