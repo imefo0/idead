@@ -88,7 +88,6 @@ def main():
                 new_idea(command[2], command[3])
         elif command[0] == "remove":
             if command[1] == "idea":
-                # TODO: срочно добавить --name, Я ЗАБЫЛ
                 if "--date" in command[2:] or "--time" in command[2:]:
                     if "--date" in command[2:] and "--time" in command[2:]:
                         remove_idea_by_date(command[command.index("--date")+1], command[command.index("--time")+1])

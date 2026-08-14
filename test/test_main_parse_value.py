@@ -34,6 +34,8 @@ def main():
             #    completed += 1
             #else:
             #    print(f" e: {result} -X> {answer}")
+
+            if answer == result: completed += 1
             results.append([answer == result, result, answer])
 
         except SystemExit:
@@ -45,13 +47,12 @@ def main():
             #    completed += 1
             #else:
             #    print(f" e: {parser.strip()} -X> {answer}")
+            if parser.strip() == answer: completed += 1
             results.append([parser.strip() == answer, parser.strip(), answer])
 
     #print(f"{completed}/{all} | {(completed/all*100):.0f}%")
 
     results.append((completed, all))
-
-
 
 if __name__ == "__main__":
     main()
