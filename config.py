@@ -86,7 +86,7 @@ def set_nested(data, keys, value): # ставит значение value в пу
     current[keys[-1]] = value
     return data
 
-def set(config_path, value):
+def set_value(config_path, value):
     with open((folder_config / "config.json"), "r") as f:
         data = json.load(f)
 

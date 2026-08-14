@@ -50,6 +50,8 @@ def new_idea(name, desc):
 
     (folder_ideas / f"i{time_now_mini}_{uuid12}.md").write_text(content)
 
+# TODO: обновить ux всех remove и добавить флаг по триграммам
+# TODO: обновить способ поиска в remove
 def remove_idea_by_date(date=False, time=False):
 
     if date: date = _clear_num(date)
@@ -166,6 +168,108 @@ def remove_idea_by_name(name):
                 (folder_ideas / coincidences[answer-1]).unlink()
 
 def remove_idea_by_custom_metadata(): pass
+
+def _to_trigram(text):
+    # hello -> hel ell llo -> 5 | 3
+    # 1234567890 -> 123 234 345 456 567 678 789 890  -> 10 | 8
+    # abcd -> abc bcd -> 4 | 2
+    # abc -> abc -> 3 | 1
+    # ab -> ab -> 2| 1
+    # hello! how are you? -> hel ell llo lo! o!  ! h  ow how ow  w a ..
+    # ab 0+2 = 2 == 2? true -> 
+    new_text = []
+    if len(text) - 2 <= 0:
+        new_text.append(text)
+    else:
+        for i in range(len(text) - 2):
+            new_text.append(text[i:i+3])
+    return new_text
+
+def _jaccard_similarity(text: list(str), variants: list(list(str))) -> float:
+    #print("text (ожидается триграммы):", text)
+    set_t = set(text)
+    set_v = set(variants)
+
+    if not set_t and not set_v:
+        return 1.0
+
+    intersection = len(set_t & set_v)
+
+    union = len(set_t | set_v)
+
+    return intersection / union if union != 0 else 0.0
+
+# NOTE: конечная функция для search_idea()
+def _trigram_search(text: str, variants: list(str)) -> tuple((int, float)): # возвращает (индекс, уверенность/оценка)
+    # TODO: добавить настройку в config: отображение в процентах или в дробных числах 
+    t = _to_trigram(text)
+    v = []
+    for i in variants:
+        v.append(_to_trigram(i))
+
+    ranked = []
+
+    for idx, cand_trigrams in enumerate(v):
+        score = _jaccard_similarity(t, cand_trigrams)
+        ranked.append((idx, score))
+
+    ranked.sort(key=lambda x: x[1], reverse=True)
+    return ranked
+
+# NOTE: тут только по названию
+def search_idea(text): # TODO: добавить поиск только по имени или только по описанию
+    # TODO: добавить так чтобы можно было считать не по триграммам а можно по 2 буквам или по 3 буквам
+    # TODO: добавить ограничение текста в config у name
+    # получить список текстов
+    ideas = _get_list_of_files(folder_ideas)
+    variants = []
+    descs = []
+    for i in ideas:
+        info = (folder_ideas / i).read_text().splitlines()[1][6:]
+        variants.append(info)
+        descs.append((folder_ideas / i).read_text().splitlines()[6])
+
+    max_number = data["settings"]["ideas"]["search"]["max_results"]
+
+    # сделать поиск
+    search_status = _trigram_search(text, variants)
+    # вывести результаты
+    number = 1
+
+    for i in data["settings"]["ideas"]["search"]["table_columns"]:
+        if i == "number": print(f"{" "*(len(str(min(max_number, len(search_status))))-1)}№", end=" ")
+        elif i == "score": print("scr.", end=" ")
+        elif i == "date": print("   date   ", end=" ") 
+        elif i == "name": print("    name     ", end=" ")
+        elif i == "desc": print(" description ", end=" ")
+        elif i == "time": print("time ", end=" ")
+    print()
+
+    print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])
+
+    for index, status in search_status[:min(max_number, len(search_status))]:
+        # TODO: добавить настройку точки после № например если стоит true то будет "1." а если false то "1" в config
+        # WARN: добавить оптимизацию чтобы считались только те данные которые нужны
+
+        n = f"{number:>{len(str(min(max_number, len(search_status))))}}"
+        score = f"{status:.2f}" # TODO: добавить вывод в процентах
+        date = ideas[index][1:9]
+        date = f"{date[:4]}-{date[4:6]}-{date[6:8]}"
+        name = f"{variants[index][:10]}{"..." if len(variants[index]) >= 10 else " "*(13 - len(variants[index]))}"
+        desc = f"{descs[index][:10]}{"..." if len(descs[index]) >= 10 else " "*(13 - len(descs[index]))}"
+        time = ideas[index][9:13]
+        time = f"{time[0:2]}:{time[2:4]}"
+        #       1. 0.31 2026-08-08 this is a ...
+        # status:.1% -> 75.9% 
+        for i in data["settings"]["ideas"]["search"]["table_columns"]:
+            if i == "number": print(number, end=" ")
+            elif i == "score": print(score, end=" ")
+            elif i == "date": print(date, end=" ")
+            elif i == "name": print(name, end=" ")
+            elif i == "desc": print(desc, end=" ")
+            elif i == "time": print(time, end=" ")
+        print()
+        number += 1
 
 def list_ideas():
     # TODO: добавить выравнивание
