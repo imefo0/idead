@@ -37,7 +37,7 @@ def main():
 
     set_value("settings.all.warning_choice", warning_choice)
 
-    for i in results: print(i)
+    #for i in results: print(i)
 
 if __name__ == "__main__":
     main()
