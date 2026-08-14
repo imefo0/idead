@@ -4,13 +4,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from config import get, set_value
 import json
 from io import StringIO
+from unittest.mock import patch
 
 def main():
 
     test = [
-        ["enter y", True],
-        ["enter n", False],
-        ["enter c", False]
+        ["y", True],
+        ["n", False],
+        ["c", False],
+        ["yes", True],
+        ["YeS", True],
+        ["Y", True]
     ]
 
     warning_choice = get()["settings"]["all"]["warning_choice"]
@@ -21,13 +25,13 @@ def main():
 
     completed = 0
     all = len(test)
-    for msg, answer in test:
-        from ideas import _warning
-        result = _warning(msg)
-
-        results.append([result == answer, result, answer])
-
-        if result == answer: completed += 1
+    for i, answer in test:
+        with patch('builtins.input', return_value=i):
+            from ideas import _warning
+            result = _warning("")
+            results.append([result == answer, result, answer])
+            if result == answer:
+                completed += 1
 
     results.append((completed, all))
 
