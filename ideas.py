@@ -50,6 +50,8 @@ def new_idea(name, desc):
 
     (folder_ideas / f"i{time_now_mini}_{uuid12}.md").write_text(content)
 
+# TODO: обновить ux всех remove и добавить флаг по триграммам
+# TODO: обновить способ поиска в remove
 def remove_idea_by_date(date=False, time=False):
 
     if date: date = _clear_num(date)
