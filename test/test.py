@@ -1,6 +1,7 @@
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from ideas import _get_list_of_files
 from config import folder_cache
 from datetime import datetime
@@ -27,6 +28,7 @@ def main():
     completed = 0
     all = 0
     for module in modules:
+        #print(module)
         result = __import__(module).main()
         r = ""
         for i in result:
@@ -36,7 +38,7 @@ def main():
             f.write(f"module: {module}\n")
             f.write(f"date: {datetime.now().strftime("%Y-%m-%d %H:%M")}\n")
             f.write(f"{r}\n")
-            f.write(f"{"-"*30}\n")
+            f.write(f"{"-"*30}")
 
         # добавляем пройденные тесты и общее количество тестов
         completed += result[-1][0]
