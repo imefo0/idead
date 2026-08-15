@@ -10,14 +10,119 @@ from typing import Any
 
 command = sys.argv[1:]
 
+# если нету using то в выводе (не показывать ошикбу) написать "пока нет описания"
+
+help_command = {
+    "using": "idead <command> <args> <flags>",
+    "about": "ideeeeead",
+    "subcmds": {
+        "init": {
+            "using": "idead init",
+            "about": "prepare the environment: create all the necessary folders and configuration files"
+        },
+        "new": {
+            "using": "idead new {idea} <name> <desc>",
+            "about": "",
+            "subcmds": {
+                "idea": {
+                    "using": "idead new idea <name> <desc>",
+                    "about": ""
+                }
+            }
+        },
+        "remove": {
+            "using": "idead remove {idea} [--date YYMMDD] [--time HHMM] [--name <name>] [--uuid <uuid6>]",
+            "about": "",
+            "subcmds": {
+                "idea": {
+                    "using": "idead remove idea [--date YYMMDD] [--time HHMM] [--name <name>] [--uuid <uuid6>]",
+                    "about": "",
+                    "flags": {
+                        "--date": {
+                            "using": "idead remove idea --date <YYMMDD>",
+                            "about": ""
+                        },
+                        "--time": {
+                            "using": "idead remove idea --time <HHMM>",
+                            "about": ""
+                        },
+                        "--name": {
+                            "using": "idead remove idea --name <name>",
+                            "about": ""
+                        },
+                        "--uuid": {
+                            "using": "idead remove idea --uuid <uuid6>",
+                            "about": ""
+                        }
+                    }
+                }
+            }
+        },
+        "search": {
+            "using": "idead search {idea} [--name <name>]",
+            "about": "",
+            "subcmds": {
+                "idea": {
+                    "using": "idead search idea [--name <name>]",
+                    "about": "",
+                    "flags": {
+                        "--name": {
+                            "using": "idead search idea --name <name>",
+                            "about": ""
+                        }
+                    }
+                }
+            }
+        },
+        "list": {
+            "using": "idead list {idea}",
+            "about": "",
+            "subcmds": {
+                "idea": {
+                    "using": "idead list idea",
+                    "about": ""
+                }
+            }
+        },
+        "config": {
+            "using": "idead config {reset | update | <path> get | <path> set <value> | <path> reset}",
+            "about": "",
+            "subcmds": {
+                "reset": {
+                    "using": "idead config reset",
+                    "about": ""
+                },
+                "update": {
+                    "using": "idead config update",
+                    "about": ""
+                },
+                "arg": {
+                    "reset": {
+                        "using": "idead <path> reset",
+                        "about": ""
+                    },
+                    "get": {
+                        "using": "idead <path> get",
+                        "about": ""
+                    },
+                    "set": {
+                        "using": "idead <path> set <value>",
+                        "about": ""
+                    }
+                }
+            }
+        }
+    }
+}
+
 # TODO: добавить --help
 # TODO: добавить use: ... в каждую команду
 # TODO: добавить тесты
 # TODO: добавить плагины и их поддержку
 # TODO: добавить описание ошибки и решение
 # TODO: добавить:
-#idead config settings.ideas.search.max_results 10  # set по умолчанию
-#idead config settings.ideas.search.max_results     # get по умолчанию
+# idead config settings.ideas.search.max_results 10  # set по умолчанию
+# idead config settings.ideas.search.max_results     # get по умолчанию
 
 def _parse_value(value: str, path: str):
     with open((Path(__file__).resolve().parent / "default_config.json"), "r") as f:
