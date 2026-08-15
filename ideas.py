@@ -20,7 +20,7 @@ def _get_list_of_files(folder):
 def _warning(msg): # y, yes?, yn -> yes? [yn] y -> True
     if data["settings"]["all"]["warning_choice"]:
         answer = input(f"{msg} [yn] ")
-        if answer.lower() in ["y", "yes"]:
+        if answer.lower().replace(" ", "").replace("\t", "").replace("\n", "") in ["y", "yes"]:
             return True
         else:
             return False
