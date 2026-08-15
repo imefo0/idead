@@ -10,9 +10,9 @@ def main():
     # сначала получаем список файлов для теста
     modules = list(
         map(
-            lambda x: x.replace(".py", ""),
+            lambda x: x.replace(".py", ""), # убираем .py чтобы был пакет
             filter(
-                lambda x: x not in ["__init__.py", "test.py"],
+                lambda x: x not in ["__init__.py", "test.py"], # исключаем эти файлы
                 _get_list_of_files(Path(__file__).resolve().parent)
             )
         )
@@ -48,7 +48,7 @@ def main():
     RESET = "\033[0m"
 
     num_of_progress_bar_segments = 30
-    green_sells = int(num_of_progress_bar_segments / all * completed)
+    green_sells = int(round((num_of_progress_bar_segments / all * completed), 0))
 
     print("[", end="")
     print(f"{GREEN}{"█"*green_sells}{RESET}", end="")

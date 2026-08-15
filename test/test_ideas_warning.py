@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 def main():
     test = [
-        ["y", True],
+        ["y", True], #!
         ["n", False],
         ["c", False],
         ["yes", True],
