@@ -198,10 +198,10 @@ def _to_trigram(text):
             new_text.append(text[i:i+3])
     return new_text
 
-def _jaccard_similarity(text: list(str), variants: list(list(str))) -> float:
+def _jaccard_similarity(text: list(str), variant: list(str)) -> float:
     #print("text (ожидается триграммы):", text)
     set_t = set(text)
-    set_v = set(variants)
+    set_v = set(variant)
 
     if not set_t and not set_v:
         return 1.0
