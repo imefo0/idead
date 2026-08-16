@@ -41,7 +41,8 @@ def init():
     folder_guides.mkdir(parents=True, exist_ok=True)
 
 def new_idea(name, desc):
-    # TODO: добавит в config формат даты
+    # TODO: добавить в config формат даты
+    # TODO: доавить сообщение о том что идея добавилась и показать uuid
     time_now = datetime.now().strftime("%Y-%m-%d %H:%M")
     time_now_mini = datetime.now().strftime("%Y%m%d%H%M")
 
@@ -49,6 +50,18 @@ def new_idea(name, desc):
     content = f"---\nname: {name}\ndate: {time_now}\nuuid: {uuid12}\nversion: {data["settings"]["ideas"]["version"]}\n---\n{desc}"
 
     (folder_ideas / f"i{time_now_mini}_{uuid12}.md").write_text(content)
+
+def test_new_idea(name, desc):
+    # TODO: добавит в config формат даты
+    time_now = datetime.now().strftime("%Y-%m-%d %H:%M")
+    time_now_mini = datetime.now().strftime("%Y%m%d%H%M")
+
+    uuid6 = uuid.uuid4().hex[:6]
+    content = f"---\nname: {name}\ndate: {time_now}\nuuid: {uuid6}\nversion: {data["settings"]["ideas"]["version"]}\n---\n{desc}"
+
+    (Path.home() / ".cache/idead/tests/ideas" / f"i{time_now_mini}_{uuid6}.md").write_text(content)
+
+    return uuid6
 
 # TODO: обновить ux всех remove и добавить флаг по триграммам
 # TODO: обновить способ поиска в remove
