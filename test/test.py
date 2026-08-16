@@ -23,7 +23,7 @@ def main():
 
     uuid6 = uuid.uuid4().hex[:6]
 
-    Path(folder_cache / "tests").mkdir(parents=True, exist_ok=True)
+    Path(folder_cache / "tests" / "passed_tests").mkdir(parents=True, exist_ok=True)
 
     completed = 0
     all = 0
@@ -34,7 +34,7 @@ def main():
         for i in result:
             r += f"{i}\n"
 
-        with open((folder_cache / "tests" / f"{uuid6}.txt"), "a") as f: # создаем файл, если нет, добавляет в файл
+        with open((folder_cache / "tests" / "passed_tests" / f"{uuid6}.txt"), "a") as f: # создаем файл, если нет, добавляет в файл
             f.write(f"module: {module}\n")
             f.write(f"date: {datetime.now().strftime("%Y-%m-%d %H:%M")}\n")
             f.write(f"{r}\n")
