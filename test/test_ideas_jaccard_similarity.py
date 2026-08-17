@@ -24,7 +24,7 @@ def main():
         results.append([round(result, 3) == round(answer, 3), result, answer])
         if round(result, 3) == round(answer, 3):
             completed += 1
-        print(f"{"V" if round(result, 3) == round(answer, 3) else "X"} {round(result, 3)} {round(answer, 3)}")
+        #print(f"{"V" if round(result, 3) == round(answer, 3) else "X"} {round(result, 3)} {round(answer, 3)}")
 
     results.append((completed, all))
 
