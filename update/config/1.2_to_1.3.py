@@ -11,6 +11,10 @@ data = core.add(data, "helper", {
             "using": "idead init",
             "about": "prepare the environment: create all the necessary folders and configuration files"
         },
+        "test": {
+            "using": "idead test",
+            "about": "run all tests and show progress"
+        },
         "new": {
             "using": "idead new {idea} <name> <desc>",
             "about": "create new entity: idea, post, task, or guide",
