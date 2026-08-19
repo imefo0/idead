@@ -31,7 +31,7 @@ def main():
             completed += 1
 
     results.append((completed, all))
-    print(results)
+    #print(results)
     return results
 
 if __name__ == "__main__":
