@@ -7,6 +7,7 @@ import uuid
 from config import *
 from ideas import *
 from typing import Any
+import test.test
 
 command = sys.argv[1:]
 data = get()
@@ -179,6 +180,9 @@ def main():
                 get_value(command[1])
             elif command[2] == "reset":
                 reset_value(command[1])
+        elif command[0] == "test":
+            test.test.main()
+
 
 
 # TODO: добавить add, remove, rename, rewrite idea
