@@ -1,18 +1,22 @@
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from config import get_nested
+from config import set_nested
 import json
 
 def main():
     test = [
         [
-            [{"a": {"b": "321", "x": "2+5-321"}}, ["a", "b"]],
-            "321"
+            [{"a": {"b": "321", "x": "2+5-321"}}, ["a", "b"], "123"],
+            {"a": {"b": "123", "x": "2+5-321"}}
         ],
         [
-            [{"a": {"b": {"e": "1", "x": 17}}}, ["a", "b", "e", "x"]],
-            None
+            [{"a": {"b": {"e": "1", "x": 17}}}, ["a", "b", "e", "x"], False],
+            {"a": {"b": {"e": {"x": False}, "x": 17}}}
+        ],
+        [
+            [{"a": {"c": "wow"}}, ["a", "b", "1", "error"], "testing"],
+            {"a": {"b": {"1": {"error": "testing"}}, "c": "wow"}}
         ]
     ]
 
@@ -21,7 +25,7 @@ def main():
     completed = 0
     all = len(test)
     for i, answer in test:
-        result = get_nested(*i)
+        result = set_nested(*i)
         results.append([result == answer, result, answer])
         if result == answer:
             completed += 1
@@ -32,5 +36,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
