@@ -5,9 +5,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from ideas import _get_list_of_files
 from config import folder_cache
 from datetime import datetime
+import time
 import uuid
 
 def main():
+    start = time.perf_counter()
     # сначала получаем список файлов для теста
     modules = list(
         map(
@@ -50,13 +52,15 @@ def main():
     RESET = "\033[0m"
 
     num_of_progress_bar_segments = 30
-    green_sells = int(round((num_of_progress_bar_segments / all * completed), 0))
+    green_cells = int(round((num_of_progress_bar_segments / all * completed), 0))
+
+    end = time.perf_counter()
 
     print("[", end="")
-    print(f"{GREEN}{"█"*green_sells}{RESET}", end="")
-    print(f"{RED}{"█"*(num_of_progress_bar_segments - green_sells)}{RESET}", end="")
+    print(f"{GREEN}{"█"*green_cells}{RESET}", end="")
+    print(f"{RED}{"█"*(num_of_progress_bar_segments - green_cells)}{RESET}", end="")
     print("]", end=" ")
-    print(f"{completed}/{all} | {(completed/all*100):.0f}%")
+    print(f"{completed}/{all} | {(completed/all*100):.0f}% {end - start:.4f}s")
     # записываем подробности в кэш
     # добавить флаг который показывает недавные тесты из кэша
 
