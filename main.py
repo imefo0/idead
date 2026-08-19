@@ -7,17 +7,74 @@ import uuid
 from config import *
 from ideas import *
 from typing import Any
+import test.test
 
 command = sys.argv[1:]
+data = get()
 
-# TODO: добавить --help
-# TODO: добавить use: ... в каждую команду
-# TODO: добавить тесты
+# если нету using то в выводе (не показывать ошикбу) написать "пока нет описания"
+
 # TODO: добавить плагины и их поддержку
 # TODO: добавить описание ошибки и решение
 # TODO: добавить:
-#idead config settings.ideas.search.max_results 10  # set по умолчанию
-#idead config settings.ideas.search.max_results     # get по умолчанию
+# idead config settings.ideas.search.max_results 10  # set по умолчанию
+# idead config settings.ideas.search.max_results     # get по умолчанию
+
+def _parse_command(path: list(str), data):
+    # path: config.arg.get
+    #print(keys)
+    
+    keys = path.copy()
+    # преобразуем 
+
+    if keys and keys[0] == "idead":
+        keys = keys[1:]
+
+    if keys and keys[0] == "config":
+        if len(keys) >= 2 and keys[1] not in ["reset", "update"]:
+            keys[1] = "arg"
+
+    for i in range(len(keys)-1):
+        if keys[i] in ["--date", "--time", "--uuid", "--name"]:
+            keys[i+1] = "arg"
+
+    if keys and keys[-1] == "arg":
+        keys.pop()
+
+    result = []
+    for part in keys:
+        if part.startswith("--"):
+            result.append("flags")
+            result.append(part)
+        else:
+            result.append("subcmds")
+            result.append(part)
+
+    for i in range(len(result)-1, -1, -1):
+        #print(result[i], end=" ")
+        if result[i] == "subcmds" and result[i-1] == "arg":
+            del result[i]
+
+    keys = result.copy()
+
+    #print()
+    #print(keys)
+    #return
+
+    # получаем значение
+    current = data
+
+    # Проходим по всем ключам, создавая пустые словари при необходимости
+    for key in ["helper", *keys]:
+        if key not in current or not isinstance(current[key], dict):
+            current[key] = {}
+        current = current[key]
+
+    # Если дошли до конца — забираем about и using
+    about = current.get("about", "")
+    using = current.get("using", "")
+
+    print(f"using: {using}\nabout: {about}")
 
 def _parse_value(value: str, path: str):
     with open((Path(__file__).resolve().parent / "default_config.json"), "r") as f:
@@ -81,6 +138,11 @@ def main():
     # TODO: добавить переменные для обозначения флагов
     # TODO: добавить поддержку удаления идеи сразу с несколькими флагами
     if len(command) > 0:
+        if "--help" in command:
+            del command[command.index("--help")]
+            _parse_command(command, data)
+            return
+
         if command[0] == "init":
             init()
         elif command[0] == "new":
@@ -88,7 +150,6 @@ def main():
                 new_idea(command[2], command[3])
         elif command[0] == "remove":
             if command[1] == "idea":
-                # TODO: срочно добавить --name, Я ЗАБЫЛ
                 if "--date" in command[2:] or "--time" in command[2:]:
                     if "--date" in command[2:] and "--time" in command[2:]:
                         remove_idea_by_date(command[command.index("--date")+1], command[command.index("--time")+1])
@@ -119,6 +180,9 @@ def main():
                 get_value(command[1])
             elif command[2] == "reset":
                 reset_value(command[1])
+        elif command[0] == "test":
+            test.test.main()
+
 
 
 # TODO: добавить add, remove, rename, rewrite idea

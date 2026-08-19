@@ -40,7 +40,7 @@ def main():
                 result = update_from(current_version)
                 current_version = result[1]
                 if not result[0]:
-                    print("E: Not Update File Found")
+                    print("E: No Update File Found")
                     sys.exit(0)
 
             print(f"Successful update! Current version: {current_version}")

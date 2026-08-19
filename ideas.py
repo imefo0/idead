@@ -20,7 +20,7 @@ def _get_list_of_files(folder):
 def _warning(msg): # y, yes?, yn -> yes? [yn] y -> True
     if data["settings"]["all"]["warning_choice"]:
         answer = input(f"{msg} [yn] ")
-        if answer.lower() in ["y", "yes"]:
+        if answer.lower().replace(" ", "").replace("\t", "").replace("\n", "") in ["y", "yes"]:
             return True
         else:
             return False
@@ -41,14 +41,27 @@ def init():
     folder_guides.mkdir(parents=True, exist_ok=True)
 
 def new_idea(name, desc):
-    # TODO: добавит в config формат даты
+    # TODO: добавить в config формат даты
+    # TODO: доавить сообщение о том что идея добавилась и показать uuid
     time_now = datetime.now().strftime("%Y-%m-%d %H:%M")
-    time_now_mini = now = datetime.now().strftime("%Y%m%d%H%M")
+    time_now_mini = datetime.now().strftime("%Y%m%d%H%M")
 
     uuid12 = uuid.uuid4().hex[:6]
     content = f"---\nname: {name}\ndate: {time_now}\nuuid: {uuid12}\nversion: {data["settings"]["ideas"]["version"]}\n---\n{desc}"
 
     (folder_ideas / f"i{time_now_mini}_{uuid12}.md").write_text(content)
+
+def test_new_idea(name, desc):
+    # TODO: добавит в config формат даты
+    time_now = datetime.now().strftime("%Y-%m-%d %H:%M")
+    time_now_mini = datetime.now().strftime("%Y%m%d%H%M")
+
+    uuid6 = uuid.uuid4().hex[:6]
+    content = f"---\nname: {name}\ndate: {time_now}\nuuid: {uuid6}\nversion: {data["settings"]["ideas"]["version"]}\n---\n{desc}"
+
+    (Path.home() / ".cache/idead/tests/ideas" / f"i{time_now_mini}_{uuid6}.md").write_text(content)
+
+    return uuid6
 
 # TODO: обновить ux всех remove и добавить флаг по триграммам
 # TODO: обновить способ поиска в remove
@@ -185,10 +198,10 @@ def _to_trigram(text):
             new_text.append(text[i:i+3])
     return new_text
 
-def _jaccard_similarity(text: list(str), variants: list(list(str))) -> float:
+def _jaccard_similarity(text: list(str), variant: list(str)) -> float:
     #print("text (ожидается триграммы):", text)
     set_t = set(text)
-    set_v = set(variants)
+    set_v = set(variant)
 
     if not set_t and not set_v:
         return 1.0
