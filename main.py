@@ -19,6 +19,7 @@ data = get()
 # TODO: добавить:
 # idead config settings.ideas.search.max_results 10  # set по умолчанию
 # idead config settings.ideas.search.max_results     # get по умолчанию
+# TODO: добавить гайды
 
 def _parse_command(path: list(str), data):
     # path: config.arg.get
