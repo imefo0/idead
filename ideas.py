@@ -8,6 +8,9 @@ data = get()
 # TODO: добавить город в метаданные идей и имя пользователя
 # TODO: добавить триграммы в search & remove
 
+class Idea:
+    pass
+
 def _get_list_of_files(folder):
     files = []
 
