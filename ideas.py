@@ -9,7 +9,27 @@ data = get()
 # TODO: добавить триграммы в search & remove
 
 class Idea:
-    pass
+    def __init__(self, name, desc):
+        self.name = name
+        self.desc = desc
+
+        self.uuid = uuid.uuid4().hex[:6]
+
+        self.version = data["settings"]["ideas"]["version"]
+
+        self.date = datetime.now().strftime("%Y-%m-%d")
+        self.time = datetime.now().strftime("%H:%M")
+
+        self.date_mini = datetime.now().strftime("%Y%m%d")
+        self.time_mini = datetime.now().strftime("%H%M")
+
+    def save(self):
+        content = f"---\nname: {self.name}\ndate: {self.date} {self.time}\nuuid: {self.uuid}\nversion: {self.version}\n---\n{self.desc}"
+        (folder_ideas / f"i{self.date_mini}{self.time_mini}_{self.uuid}.md").write_text(content)
+
+if __name__ == "__main__":
+    idea = Idea(input(), input())
+    idea.save()
 
 def _get_list_of_files(folder):
     files = []
