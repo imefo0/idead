@@ -27,10 +27,6 @@ class Idea:
         content = f"---\nname: {self.name}\ndate: {self.date} {self.time}\nuuid: {self.uuid}\nversion: {self.version}\n---\n{self.desc}"
         (folder_ideas / f"i{self.date_mini}{self.time_mini}_{self.uuid}.md").write_text(content)
 
-if __name__ == "__main__":
-    idea = Idea(input(), input())
-    idea.save()
-
 def _get_list_of_files(folder):
     files = []
 
@@ -186,141 +182,6 @@ def remove_idea(date=None, time=None, uuid6=None, name=None):
                 for i in answer:
                     (folder_ideas / coincidences[int(i)-1]).unlink()
 
-def remove_idea_by_date(date=None, time=None):
-
-    if date: date = _clear_num(date)
-    if time: time = _clear_num(time)
-
-    coincidences = []
-    for i in _get_list_of_files(folder_ideas): # i202608041359_dd0cd3.md -> i 2026-08-04 13:59 _ dd0cd3 .md
-        if time is None:
-            if date is None:
-                print("E: No Data Or Time Entered")
-                return
-            if i[1:9] == date:
-                coincidences.append(i)
-        else:
-            if date is None:
-                if i[9:13] == time:
-                    coincidences.append(i)
-            else:
-                if i[1:9] == date and i[9:13] == time:
-                    coincidences.append(i)
-
-    if len(coincidences) == 0: # нет идей
-        # TODO: добавить класс Error и добавить эту ошибку как Error.NoMatchesFound
-        # TODO: добавить класс Error и добавить ошибку Error.IncorrectDate / IncorrectInput
-        print("E: No Matches Found")
-
-    elif len(coincidences) == 1:
-        # TODO: добавить так чтобы была понятна какая идея удаляется
-        print(f"Found 1 idea:\ndate: {coincidences[0][1:5]}-{coincidences[0][5:7]}-{coincidences[0][7:9]}, uuid: {coincidences[0][14:20]}")
-        if _warning(data["warnings"]["ideas"]["delete"]):
-            print("Deleting idea...")
-            (folder_ideas / coincidences[0]).unlink()
-    else: # много идей
-        # TODO: добавить удаление нескольких идей сразу
-
-        print(f"Found {len(coincidences)} ideas for{f" {date[:4]}-{date[4:6]}-{date[6:8]}" if date else ""}{f" {time[:2]}:{time[2:]}" if time else ""}:")
-        print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])
-        for i in range(len(coincidences)): # i202608041359_dd0cd3 -> i 20260804 1359 _dd0cd3
-            date_coincidences = f"{coincidences[i][1:5]}-{coincidences[i][5:7]}-{coincidences[i][7:9]}"
-            time_coincidences = f"{coincidences[i][9:11]}:{coincidences[i][11:13]}"
-            print(f"  {i+1}. {date_coincidences} {time_coincidences} [{coincidences[i][14:-3]}]")
-
-        print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])
-
-        # TODO: переместить в config
-        answer = input(f"Enter number to delete (1-{len(coincidences)}, 0 to cancel or enter ideas via ',' (1,2,3,4)): ")
-        answer = answer.split(",")
-        answer = answer[0] if len(answer) == 1 else answer
-        if not isinstance(answer, list) and not answer.isdigit():
-            print("E: Incorrect number")
-            print("Cancellation...")
-            answer = 0
-        if answer != 0 and not isinstance(answer, list):
-            print(f"Selected idea:\ndate: {coincidences[answer-1][1:5]}-{coincidences[answer-1][5:7]}-{coincidences[answer-1][7:9]}, uuid: {coincidences[answer-1][14:20]}")
-            if _warning(data["warnings"]["ideas"]["delete"]):
-                print("Deleting idea...")
-                (folder_ideas / coincidences[answer-1]).unlink()
-        if isinstance(answer, list):
-            for i in answer:
-                if not i.isdigit():
-                    print("E: Incorrect number")
-                    print("Cancellation...")
-                    return
-                if i == "0":
-                    return
-            print("Selected ideas:")
-            for i in answer:
-                print(f"date: {coincidences[int(i)-1][1:5]}-{coincidences[int(i)-1][5:7]}-{coincidences[int(i)-1][7:9]}, uuid: {coincidences[int(i)-1][14:20]}")
-
-            if _warning(data["warnings"]["ideas"]["delete"]): # FIXME: исправить текст, там this idea, надо these ideas
-                print("Deleting ideas...")
-                for i in answer:
-                    (folder_ideas / coincidences[int(i)-1]).unlink()
-
-def remove_idea_by_uuid(uuid_):
-    coincidences = []
-    for i in _get_list_of_files(folder_ideas): # i202608041359_dd0cd3.md -> i 2026-08-04 13:59 _ dd0cd3 .md
-        if i[14:20] == uuid_:
-            coincidences.append(i)
-
-    if len(coincidences) == 0: # нет идей
-        # TODO: добавить класс Error и добавить эту ошибку как Error.NoMatchesFound
-        # TODO: добавить класс Error и добавить ошибку Error.IncorrectDate / IncorrectInput
-        print("E: No Matches Found")
-
-    elif len(coincidences) == 1:
-        # TODO: добавить так чтобы была понятна какая идея удаляется
-
-        if _warning(data["warnings"]["ideas"]["delete"]):
-            print("Deleting idea...")
-            (folder_ideas / coincidences[0]).unlink()
-
-def remove_idea_by_name(name):
-
-    coincidences = []
-    for i in _get_list_of_files(folder_ideas): # i202608041359_dd0cd3.md -> i 2026-08-04 13:59 _ dd0cd3 .md
-        # print((folder_ideas / i).read_text().splitlines()[1])
-        if (folder_ideas / i).read_text().splitlines()[1][6:] == name:
-            coincidences.append(i)
-
-    if len(coincidences) == 0: # нет идей
-        # TODO: добавить класс Error и добавить эту ошибку как Error.NoMatchesFound
-        # TODO: добавить класс Error и добавить ошибку Error.IncorrectDate / IncorrectInput
-        print("E: No Matches Found")
-
-    elif len(coincidences) == 1:
-        # TODO: добавить так чтобы была понятна какая идея удаляется
-
-        if _warning(data["warnings"]["ideas"]["delete"]):
-            print("Deleting idea...")
-            (folder_ideas / coincidences[0]).unlink()
-
-    else: # много идей
-        # TODO: добавить удаление нескольких идей сразу
-
-        print(f"Found {len(coincidences)} ideas for {name}:")
-        print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])
-        for i in range(len(coincidences)): # i202608041359_dd0cd3 -> i 20260804 1359 _dd0cd3
-            date_coincidences = f"{coincidences[i][1:5]}-{coincidences[i][5:7]}-{coincidences[i][7:9]}"
-            time_coincidences = f"{coincidences[i][9:11]}:{coincidences[i][11:13]}"
-            print(f"  {i+1}. {date_coincidences} {time_coincidences} [{coincidences[i][14:-3]}]")
-
-        print("-"*30)
-        try:
-            answer = int(input(f"Enter number to delete (1-{len(coincidences)}, or 0 to cancel): "))
-        except ValueError:
-            print("E: Incorrect number")
-            print("Cancellation...")
-            answer = 0
-
-        if answer != 0:
-            if _warning(data["warnings"]["ideas"]["delete"]):
-                print("Deleting idea...")
-                (folder_ideas / coincidences[answer-1]).unlink()
-
 def remove_idea_by_custom_metadata(): pass
 
 def _to_trigram(text):
@@ -456,3 +317,6 @@ def list_ideas():
         num += 1
 
     print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])
+
+if __name__ == "__main__":
+    remove_idea_by_date(input(), input())
