@@ -74,13 +74,13 @@ def new_idea(name, desc):
     format_date = "%Y-%m-%d"
     format_time = "%H:%M"
 
-    time_now = datetime.now().strftime(format_date + format_time)
+    time_now = datetime.now().strftime(f"{format_date} {format_time}")
     time_now_mini = datetime.now().strftime("%Y%m%d%H%M")
 
     uuid6 = uuid.uuid4().hex[:6]
     content = f"---\nname: {name}\ndate: {time_now}\nuuid: {uuid6}\nversion: {data["settings"]["ideas"]["version"]}\n---\n{desc}"
 
-    (folder_ideas / f"i{time_now_mini}_{uuid12}.md").write_text(content)
+    (folder_ideas / f"i{time_now_mini}_{uuid6}.md").write_text(content)
 
     print(f"New idea: {name}; uuid: {uuid6}")
 
@@ -88,7 +88,7 @@ def test_new_idea(name, desc):
     format_date = "%Y-%m-%d"
     format_time = "%H:%M"
 
-    time_now = datetime.now().strftime(format_date + format_time)
+    time_now = datetime.now().strftime(f"{format_date} {format_time}")
     time_now_mini = datetime.now().strftime("%Y%m%d%H%M")
 
     uuid6 = uuid.uuid4().hex[:6]
