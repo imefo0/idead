@@ -52,6 +52,17 @@ def _warning(msg): # y, yes?, yn -> yes? [yn] y -> True
 def _clear_num(num_str): # WARN: FFP
     return ''.join(filter(str.isdigit, num_str))
 
+def get_value_from_metadata(metadata: list(str), data_search: str) -> (bool, str):
+    prefix = f"{data_search}: "
+
+    for item in metadata:
+        if isinstance(item, str) and item.startswith(prefix):
+            value = item[len(prefix):].strip()
+            return True, value
+
+    # Не найдено
+    print("E: Name In Idea Not Found")
+    return False, None
 
 def init():
     folder_config.mkdir(parents=True, exist_ok=True)
