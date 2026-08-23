@@ -102,7 +102,10 @@ def test_new_idea(name, desc):
 # TODO: обновить способ поиска в remove
 # TODO: добавить версию идеи 
 # TODO: добавить поиск идеи по описанию в v0.7.0
+# TODO: добавить настройку в конфиг (search name while deleting) на hard или soft (hard это '==' а soft это через триграммы)
 def remove_idea(date=None, time=None, uuid6=None, name=None):
+    remove_idea_match_mode = "hard" # hard/soft
+
     if date is None and time is None and uuid6 is None and name is None:
         print("E: No Data To Delete The Idea")
         return
