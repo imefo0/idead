@@ -48,7 +48,7 @@ def _warning(msg): # y, yes?, yn -> yes? [yn] y -> True
 def _clear_num(num_str): # WARN: FFP
     return ''.join(filter(str.isdigit, num_str))
 
-def get_value_from_metadata(metadata: list(str), data_search: str) -> (bool, str):
+def _get_vale_from_metadata(metadata: list(str), data_search: str) -> (bool, str):
     prefix = f"{data_search}: "
 
     for item in metadata:
@@ -59,6 +59,32 @@ def get_value_from_metadata(metadata: list(str), data_search: str) -> (bool, str
     # Не найдено
     print("E: Name In Idea Not Found")
     return False, None
+
+def _extract_metadata_as_list(lines):
+    result = []
+    started = False  # флаг: начали ли мы уже собирать метаданные
+
+    for line in lines:
+        stripped = line.strip()
+
+        # Пропускаем пустые строки
+        if not stripped:
+            continue
+
+        # Если встретили разделитель "---" после начала сбора — останавливаемся
+        if stripped == "---":
+            if started:
+                break
+            # Если ещё не начали, это может быть начальный разделитель — просто пропускаем
+            continue
+
+        started = True  # считаем, что метаданные начались
+
+        # Проверяем формат key: value
+        if ":" in stripped:
+            result.append(stripped)
+        # Всё остальное (включая *desc* и любые другие строки) просто пропускается
+    return result
 
 def init():
     folder_config.mkdir(parents=True, exist_ok=True)
@@ -116,7 +142,7 @@ def remove_idea(date=None, time=None, uuid6=None, name=None):
 
     coincidences = []
     files = _get_list_of_files(folder_ideas)
-    names = [get_value_from_metadata((folder_ideas / x).read_text().splitlines()[1:-2], "name") for x in files]
+    names = [_get_vale_from_metadata(_extract_metadata_as_list((folder_ideas / x).read_text().splitlines()), "name") for x in files]
     weights = []
 
     # проходимся по каждому файлу
@@ -126,7 +152,7 @@ def remove_idea(date=None, time=None, uuid6=None, name=None):
         candidate_date = i[1:9]
         candidate_time = i[9:13]
         candidate_uuid = i[14:20]
-        result = get_value_from_metadata((folder_ideas / i).read_text().splitlines()[1:-2], "name")
+        result = _get_vale_from_metadata(_extract_metadata_as_list((folder_ideas / i).read_text().splitlines()), "name")
         if not result[0]:
             print(f"WARN: No Name In Idea (uuid: {candidate_uuid}) Found")
             continue
