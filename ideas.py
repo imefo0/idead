@@ -64,13 +64,15 @@ def init():
     folder_guides.mkdir(parents=True, exist_ok=True)
 
 def new_idea(name, desc):
+    format_date = "%Y-%m-%d"
+    format_time = "%H:%M"
     # TODO: добавить в config формат даты
     # TODO: доавить сообщение о том что идея добавилась и показать uuid
-    time_now = datetime.now().strftime("%Y-%m-%d %H:%M")
+    time_now = datetime.now().strftime(format_date + format_time)
     time_now_mini = datetime.now().strftime("%Y%m%d%H%M")
 
-    uuid12 = uuid.uuid4().hex[:6]
-    content = f"---\nname: {name}\ndate: {time_now}\nuuid: {uuid12}\nversion: {data["settings"]["ideas"]["version"]}\n---\n{desc}"
+    uuid6 = uuid.uuid4().hex[:6]
+    content = f"---\nname: {name}\ndate: {time_now}\nuuid: {uuid6}\nversion: {data["settings"]["ideas"]["version"]}\n---\n{desc}"
 
     (folder_ideas / f"i{time_now_mini}_{uuid12}.md").write_text(content)
 
