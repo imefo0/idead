@@ -100,6 +100,8 @@ def set_value(config_path, value):
     with open((folder_config / "config.json"), "w") as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
 
+    print(f"{config_path}: {value}")
+
 def get_value(config_path):
     with open((folder_config / "config.json"), "r") as f:
         data = json.load(f)
@@ -108,7 +110,7 @@ def get_value(config_path):
     value = get_nested(data, path)
     if value is not None:
         # TODO: изменить формат вывода
-        print(value)
+        print(f"{config_path}: {value}")
     else:
         print("E: No Path Found")
 
