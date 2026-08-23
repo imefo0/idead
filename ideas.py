@@ -105,6 +105,87 @@ def test_new_idea(name, desc):
 # TODO: обновить ux всех remove и добавить флаг по триграммам
 # TODO: обновить способ поиска в remove
 # TODO: добавить версию идеи 
+# TODO: добавить поиск идеи по описанию в v0.7.0
+def remove_idea(date=None, time=None, uuid6=None, name=None):
+    if date is None and time is None and uuid6 is None and name is None:
+        print("E: No Data To Delete The Idea")
+        return
+
+    if date: date = _clear_num(date)
+    if time: time = _clear_num(time)
+
+    coincidences = []
+    for i in _get_list_of_files(folder_ideas): # i202608041359_dd0cd3.md -> i 2026-08-04 13:59 _ dd0cd3 .md
+        candidate_date = i[1:9]
+        candidate_time = i[9:13]
+        candidate_uuid = i[14:20]
+        result = get_value_from_metadata((folder_ideas / i).read_text().splitlines()[1:-2], "name")
+        if not result[0]:
+            print(f"WARN: No Name In Idea (uuid: {candidate_uuid}) Found")
+            continue
+        candidate_name = result[1]
+        #print(f"date = {candidate_date}, time = {candidate_time}, uuid = {candidate_uuid}, name = {candidate_name}")
+
+        # если date равна с кандидатом то считаем как совпадение или если date пустой то считаем что "прошел"
+        if date is None or date == candidate_date:
+            if time is None or time == candidate_time:
+                if uuid6 is None or uuid6 == candidate_uuid:
+                    if name is None or name == candidate_name:
+                        coincidences.append(i)
+
+    if len(coincidences) == 0: # нет идей
+        # TODO: добавить класс Error и добавить эту ошибку как Error.NoMatchesFound
+        # TODO: добавить класс Error и добавить ошибку Error.IncorrectDate / IncorrectInput
+        print("E: No Matches Found")
+
+    elif len(coincidences) == 1:
+        # TODO: добавить настройку чтобы выводились только определенные параметры или автоматически (в зависимости от введенных данных)
+        print(f"Found 1 idea:\ndate: {coincidences[0][1:5]}-{coincidences[0][5:7]}-{coincidences[0][7:9]}, uuid: {coincidences[0][14:20]}")
+        if _warning(data["warnings"]["ideas"]["delete"]):
+            print("Deleting idea...")
+            (folder_ideas / coincidences[0]).unlink()
+    else: # много идей
+        # TODO: добавить удаление нескольких идей сразу
+
+        print(f"Found {len(coincidences)} ideas for{f" {date[:4]}-{date[4:6]}-{date[6:8]}" if date else ""}{f" {time[:2]}:{time[2:]}" if time else ""}:")
+        print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])
+        for i in range(len(coincidences)): # i202608041359_dd0cd3 -> i 20260804 1359 _dd0cd3
+            date_coincidences = f"{coincidences[i][1:5]}-{coincidences[i][5:7]}-{coincidences[i][7:9]}"
+            time_coincidences = f"{coincidences[i][9:11]}:{coincidences[i][11:13]}"
+            print(f"  {i+1}. {date_coincidences} {time_coincidences} [{coincidences[i][14:-3]}]")
+
+        print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])
+
+        # TODO: переместить в config
+        answer = input(f"Enter number to delete (1-{len(coincidences)}, 0 to cancel or enter ideas via ',' (1,2,3,4)): ")
+        answer = answer.split(",")
+        answer = answer[0] if len(answer) == 1 else answer
+        if not isinstance(answer, list) and not answer.isdigit():
+            print("E: Incorrect number")
+            print("Cancellation...")
+            answer = 0
+        if answer != 0 and not isinstance(answer, list):
+            print(f"Selected idea:\ndate: {coincidences[answer-1][1:5]}-{coincidences[answer-1][5:7]}-{coincidences[answer-1][7:9]}, uuid: {coincidences[answer-1][14:20]}")
+            if _warning(data["warnings"]["ideas"]["delete"]):
+                print("Deleting idea...")
+                (folder_ideas / coincidences[answer-1]).unlink()
+        if isinstance(answer, list):
+            for i in answer:
+                if not i.isdigit():
+                    print("E: Incorrect number")
+                    print("Cancellation...")
+                    return
+                if i == "0":
+                    return
+            print("Selected ideas:")
+            for i in answer:
+                print(f"date: {coincidences[int(i)-1][1:5]}-{coincidences[int(i)-1][5:7]}-{coincidences[int(i)-1][7:9]}, uuid: {coincidences[int(i)-1][14:20]}")
+
+            if _warning(data["warnings"]["ideas"]["delete"]): # FIXME: исправить текст, там this idea, надо these ideas
+                print("Deleting ideas...")
+                for i in answer:
+                    (folder_ideas / coincidences[int(i)-1]).unlink()
+
 def remove_idea_by_date(date=None, time=None):
 
     if date: date = _clear_num(date)
@@ -180,7 +261,6 @@ def remove_idea_by_date(date=None, time=None):
                     (folder_ideas / coincidences[int(i)-1]).unlink()
 
 def remove_idea_by_uuid(uuid_):
-
     coincidences = []
     for i in _get_list_of_files(folder_ideas): # i202608041359_dd0cd3.md -> i 2026-08-04 13:59 _ dd0cd3 .md
         if i[14:20] == uuid_:

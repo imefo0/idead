@@ -150,7 +150,14 @@ def main():
                 new_idea(command[2], command[3])
         elif command[0] == "remove":
             if command[1] == "idea":
-                if "--date" in command[2:] or "--time" in command[2:]:
+                date = None if "--date" not in command[2:] else command[command.index("--date")+1]
+                time = None if "--time" not in command[2:] else command[command.index("--time")+1]
+                uuid6 = None if "--uuid" not in command[2:] else command[command.index("--uuid")+1]
+                name = None if "--name" not in command[2:] else command[command.index("--name")+1]
+
+                remove_idea(date=date, time=time, uuid6=uuid6, name=name)
+
+                """if "--date" in command[2:] or "--time" in command[2:]:
                     if "--date" in command[2:] and "--time" in command[2:]:
                         remove_idea_by_date(command[command.index("--date")+1], command[command.index("--time")+1])
                     elif "--date" in command[2:]:
@@ -161,11 +168,12 @@ def main():
                     if "--uuid" in command[2:]:
                         remove_idea_by_uuid(command[command.index("--uuid")+1])
                     elif "--name" in command[2:]:
-                        remove_idea_by_name(command[command.index("--name")+1])
+                        remove_idea_by_name(command[command.index("--name")+1])"""
         elif command[0] == "search":
             if command[1] == "idea":
                 if "--name" in command[2:]:
                     search_idea(command[command.index("--name")+1])
+        # TODO: добавить флаг --results который вне зависимости от config показывает определенное количество результатов
         elif command[0] == "list":
             if command[1] == "idea":
                 list_ideas()
