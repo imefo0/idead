@@ -313,7 +313,13 @@ def search_idea(text): # TODO: добавить поиск только по и�
         # WARN: добавить оптимизацию чтобы считались только те данные которые нужны
 
         n = f"{number:>{len(str(min(max_number, len(search_status))))}}"
-        score = f"{status:.2f}" # TODO: добавить вывод в процентах
+        score_style = data["settings"]["ideas"]["search"]["score_style"] # percent или "decimal"
+        # TODO: добавить вывод в процентах
+        if score_style == "percent":
+            score = f"{round(status * 100):>3}%"
+        else:
+            score = f"{status:.2f}"
+
         date = ideas[index][1:9]
         date = f"{date[:4]}-{date[4:6]}-{date[6:8]}"
         name = f"{variants[index][:10]}{"..." if len(variants[index]) >= 10 else " "*(13 - len(variants[index]))}"
