@@ -103,8 +103,9 @@ def test_new_idea(name, desc):
 # TODO: добавить версию идеи 
 # TODO: добавить поиск идеи по описанию в v0.7.0
 # TODO: добавить настройку в конфиг (search name while deleting) на hard или soft (hard это '==' а soft это через триграммы)
+# FIXME: исправить splitlines()[1:-2] ведь если будут \n в desc то будет не правильно читать 
 def remove_idea(date=None, time=None, uuid6=None, name=None):
-    remove_idea_match_mode = "hard" # hard/soft
+    remove_idea_match_mode = data["settings"]["ideas"]["remove"].get("search_mode", "soft") # hard/soft
 
     if date is None and time is None and uuid6 is None and name is None:
         print("E: No Data To Delete The Idea")
@@ -114,7 +115,14 @@ def remove_idea(date=None, time=None, uuid6=None, name=None):
     if time: time = _clear_num(time)
 
     coincidences = []
+    files = _get_list_of_files(folder_ideas)
+    names = [get_value_from_metadata((folder_ideas / x).read_text().splitlines()[1:-2], "name") for x in files]
+    weights = []
+
+    # проходимся по каждому файлу
+    num = 0
     for i in _get_list_of_files(folder_ideas): # i202608041359_dd0cd3.md -> i 2026-08-04 13:59 _ dd0cd3 .md
+        # сохраняем данные кандидата
         candidate_date = i[1:9]
         candidate_time = i[9:13]
         candidate_uuid = i[14:20]
@@ -125,13 +133,46 @@ def remove_idea(date=None, time=None, uuid6=None, name=None):
         candidate_name = result[1]
         #print(f"date = {candidate_date}, time = {candidate_time}, uuid = {candidate_uuid}, name = {candidate_name}")
 
-        # если date равна с кандидатом то считаем как совпадение или если date пустой то считаем что "прошел"
+        # 1. если совпадают даты или если дата не введена то продолжить
         if date is None or date == candidate_date:
+            # 2. если совпадает время или если время не введено то продолжить
             if time is None or time == candidate_time:
+            # 3. если совпадает uuid или если uuid не введен то продолжить
                 if uuid6 is None or uuid6 == candidate_uuid:
-                    if name is None or name == candidate_name:
+                    # 4. если совпадет имя и если спсоб hard то добавить в coincidences
+                    if (name is None or name == candidate_name) and remove_idea_match_mode == "hard":
                         coincidences.append(i)
+                        continue
+                    if remove_idea_match_mode != "hard":
+                    # если soft:
+                    # (короче надо вывести весь список идей но в порядке убывания по уверенности, сопоставив каждый инедекс с списком имен файлов)
+                    # надо получить список имен в том порядке в таком же как и в списке файлов (до for i in _get_list_of_files(folder_ideas))
+                    # потом надо написать _trigram_search(candidate_name, name_variants)
+                        score = _jaccard_similarity(_to_trigram(name), _to_trigram(candidate_name))
+                        #print("score, num:", score, num)
+                        if score != 0.0:
+                            #print("APPEND:", score, num, i)
+                            coincidences.append(i)
+                            weights.append((num, score))
+                            #print("--- AFTER APPENDING ---")
+                            #print("coincidences:".upper(), coincidences)
+                            #print("weights:".upper(), weights)
+                            #print("-----------------------")
+                            num += 1
+                    # потом for i in _trigram_search():
+                    #       coincidences.append(files[i[0]])
+    if name is not None and remove_idea_match_mode == "soft":
+        #print("started")
+        #print("weights:", weights)
+        weights.sort(key=lambda x: x[1], reverse=True)
+        tmp_coincidences = coincidences.copy()
+        coincidences = []
+        for idx, score in weights:
+            print(idx, score)
+            print(tmp_coincidences[idx])
+            coincidences.append(tmp_coincidences[idx])
 
+    # TODO: добавить выравнивание у №, добавить настройку столбцов, добавить max_results
     if len(coincidences) == 0: # нет идей
         # TODO: добавить класс Error и добавить эту ошибку как Error.NoMatchesFound
         # TODO: добавить класс Error и добавить ошибку Error.IncorrectDate / IncorrectInput
@@ -144,8 +185,7 @@ def remove_idea(date=None, time=None, uuid6=None, name=None):
             print("Deleting idea...")
             (folder_ideas / coincidences[0]).unlink()
     else: # много идей
-        # TODO: добавить удаление нескольких идей сразу
-
+        # TODO: добавить настройку столбцов таблицы
         print(f"Found {len(coincidences)} ideas for{f" {date[:4]}-{date[4:6]}-{date[6:8]}" if date else ""}{f" {time[:2]}:{time[2:]}" if time else ""}:")
         print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])
         for i in range(len(coincidences)): # i202608041359_dd0cd3 -> i 20260804 1359 _dd0cd3
@@ -163,7 +203,7 @@ def remove_idea(date=None, time=None, uuid6=None, name=None):
             print("E: Incorrect number")
             print("Cancellation...")
             answer = 0
-        if answer != 0 and not isinstance(answer, list):
+        if answer != 0 and answer != "0" and not isinstance(answer, list):
             print(f"Selected idea:\ndate: {coincidences[answer-1][1:5]}-{coincidences[answer-1][5:7]}-{coincidences[answer-1][7:9]}, uuid: {coincidences[answer-1][14:20]}")
             if _warning(data["warnings"]["ideas"]["delete"]):
                 print("Deleting idea...")

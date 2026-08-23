@@ -8,10 +8,14 @@
         "ideas": {
             "search": {
                 "max_results": 5,
-                "table_columns": ["number", "score", "date", "name"]
+                "table_columns": ["number", "score", "date", "name"],
+                "score_style": "decimal"
             },
             "list": {
                 "max_results": -1
+            },
+            "remove": {
+                "search_mode": "soft"
             },
             "version": "1.0",
             "format": "md"
