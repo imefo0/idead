@@ -291,7 +291,7 @@ def search_idea(text): # TODO: добавить поиск только по и�
         print()
         number += 1
 
-def list_ideas():
+def list_ideas(max_results=None):
     # TODO: добавить выравнивание
     # TODO: добавить проверку даты и uuid в названии файла а не только в метаданных
     # WARN: refactor
@@ -301,14 +301,22 @@ def list_ideas():
         print("E: No Ideas Found")
         return
 
-    print(" №     date    time   uuid  ver    name")
-    print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])
     num = 1
-    for i in ideas:
+    if max_results is not None: limit = max_results
+    else:
+        max_results_config = data["settings"]["ideas"]["list"].get("max_results", -1)
+        limit = len(ideas) if max_results_config == -1 else max_results_config
+    limit = min(limit, len(ideas))
+
+    print(f"{"№":<{len(str(limit))+1}}    date    time   uuid  ver    name")
+    print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])
+
+
+    for i in ideas[:limit]:
         info = (folder_ideas / i).read_text().splitlines()
         #print(data)
         #      1. 2026-08-08 11:44 20d2aa 1.0 text
-        print(f"{num if num >= 10 else f" {num}"}. ", end="")
+        print(f"{f"{num:>{len(str(limit))}}"}. ", end="")
         print(f"{info[2][6:] if any("date" in line for line in info) else "????-??-?? ??:??"}", end=" ")
         print(f"{f"{info[3][6:]}" if any("uuid" in line for line in info) else "??????"}", end=" ")
         print(f"{f"{info[4][9:12]}" if any("version" in line for line in info) else "?.?"}", end=" ")

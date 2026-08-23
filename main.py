@@ -176,7 +176,9 @@ def main():
         # TODO: добавить флаг --results который вне зависимости от config показывает определенное количество результатов
         elif command[0] == "list":
             if command[1] == "idea":
-                list_ideas()
+                if "--result" in command[2:]:
+                    list_ideas(max_results=int(command[command.index("--result")+1]))
+                else: list_ideas()
         elif command[0] == "config":
             if command[1] == "reset":
                 reset_settings()
