@@ -10,6 +10,9 @@
                 "max_results": 5,
                 "table_columns": ["number", "score", "date", "name"]
             },
+            "list": {
+                "max_results": -1
+            },
             "version": "1.0",
             "format": "md"
         }
@@ -126,7 +129,7 @@
         }
     },
     "config": {
-        "version": "1.3"
+        "version": "2.0"
     }
 }
 
