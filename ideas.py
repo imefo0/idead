@@ -66,8 +66,7 @@ def init():
 def new_idea(name, desc):
     format_date = "%Y-%m-%d"
     format_time = "%H:%M"
-    # TODO: добавить в config формат даты
-    # TODO: доавить сообщение о том что идея добавилась и показать uuid
+    
     time_now = datetime.now().strftime(format_date + format_time)
     time_now_mini = datetime.now().strftime("%Y%m%d%H%M")
 
@@ -75,6 +74,8 @@ def new_idea(name, desc):
     content = f"---\nname: {name}\ndate: {time_now}\nuuid: {uuid6}\nversion: {data["settings"]["ideas"]["version"]}\n---\n{desc}"
 
     (folder_ideas / f"i{time_now_mini}_{uuid12}.md").write_text(content)
+
+    print(f"New idea: {name}; uuid: {uuid6}")
 
 def test_new_idea(name, desc):
     # TODO: добавит в config формат даты
