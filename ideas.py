@@ -66,7 +66,7 @@ def init():
 def new_idea(name, desc):
     format_date = "%Y-%m-%d"
     format_time = "%H:%M"
-    
+
     time_now = datetime.now().strftime(format_date + format_time)
     time_now_mini = datetime.now().strftime("%Y%m%d%H%M")
 
@@ -78,8 +78,10 @@ def new_idea(name, desc):
     print(f"New idea: {name}; uuid: {uuid6}")
 
 def test_new_idea(name, desc):
-    # TODO: добавит в config формат даты
-    time_now = datetime.now().strftime("%Y-%m-%d %H:%M")
+    format_date = "%Y-%m-%d"
+    format_time = "%H:%M"
+
+    time_now = datetime.now().strftime(format_date + format_time)
     time_now_mini = datetime.now().strftime("%Y%m%d%H%M")
 
     uuid6 = uuid.uuid4().hex[:6]
