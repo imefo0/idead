@@ -86,6 +86,25 @@ def _extract_metadata_as_list(lines):
         # Всё остальное (включая *desc* и любые другие строки) просто пропускается
     return result
 
+def _parse_filename_info(fname: str):
+    # 1. Отрезаем .md, если есть
+    base = fname.removesuffix(".md")
+    
+    # 2. Вырезаем данные по заранее известным позициям
+    # Формат имени: iYYYYMMDDHHMMSS_uuid.md
+    date_str = f"{base[1:5]}-{base[5:7]}-{base[7:9]}"       # YYYY-MM-DD
+    time_str = f"{base[9:11]}:{base[11:13]}"               # HH:MM
+    uuid_str = base[14:20]                                 # 6 символов UUID
+    
+    return {
+        "date": date_str,
+        "time": time_str,
+        "uuid": uuid_str,
+        "raw_date": base[1:9],   # Например, "20260804" - пригодится для сравнения
+        "raw_time": base[9:13],  # Например, "1359"
+        "filename": fname
+    }
+
 def init():
     folder_config.mkdir(parents=True, exist_ok=True)
     folder_data.mkdir(parents=True, exist_ok=True)
@@ -205,19 +224,20 @@ def remove_idea(date=None, time=None, uuid6=None, name=None):
         print("E: No Matches Found")
 
     elif len(coincidences) == 1:
+        info = _parse_filename_info(coincidences[0])
         # TODO: добавить настройку чтобы выводились только определенные параметры или автоматически (в зависимости от введенных данных)
-        print(f"Found 1 idea:\ndate: {coincidences[0][1:5]}-{coincidences[0][5:7]}-{coincidences[0][7:9]}, uuid: {coincidences[0][14:20]}")
+        print(f"Found 1 idea:\ndate: {info["date"]}, uuid: {info["uuid"]}")
         if _warning(data["warnings"]["ideas"]["delete"]):
             print("Deleting idea...")
-            (folder_ideas / coincidences[0]).unlink()
+            (folder_ideas / info["filename"]).unlink()
     else: # много идей
         # TODO: добавить настройку столбцов таблицы
-        print(f"Found {len(coincidences)} ideas for{f" {date[:4]}-{date[4:6]}-{date[6:8]}" if date else ""}{f" {time[:2]}:{time[2:]}" if time else ""}:")
+        print(f"Found {len(coincidences)} ideas for {f"{date}, " if date is not None else ""}{f"{time}, " if time is not None else ""}{f"{uuid6}, " if uuid6 is not None else ""}{f"{name}, " if name is not None else ""}:")
         print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])
+
         for i in range(len(coincidences)): # i202608041359_dd0cd3 -> i 20260804 1359 _dd0cd3
-            date_coincidences = f"{coincidences[i][1:5]}-{coincidences[i][5:7]}-{coincidences[i][7:9]}"
-            time_coincidences = f"{coincidences[i][9:11]}:{coincidences[i][11:13]}"
-            print(f"  {i+1}. {date_coincidences} {time_coincidences} [{coincidences[i][14:-3]}]")
+            info = _parse_filename_info(coincidences[i])
+            print(f"  {i+1}. {info["date"]} {info["time"]} [{info["uuid"]}]")
 
         print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])
 
@@ -230,7 +250,8 @@ def remove_idea(date=None, time=None, uuid6=None, name=None):
             print("Cancellation...")
             answer = 0
         if answer != 0 and answer != "0" and not isinstance(answer, list):
-            print(f"Selected idea:\ndate: {coincidences[answer-1][1:5]}-{coincidences[answer-1][5:7]}-{coincidences[answer-1][7:9]}, uuid: {coincidences[answer-1][14:20]}")
+            info = _parse_filename_info(coincidences[answer-1])
+            print(f"Selected idea:\ndate: {info["date"]}, uuid: {coincidences[answer-1][14:20]}")
             if _warning(data["warnings"]["ideas"]["delete"]):
                 print("Deleting idea...")
                 (folder_ideas / coincidences[answer-1]).unlink()
@@ -244,7 +265,8 @@ def remove_idea(date=None, time=None, uuid6=None, name=None):
                     return
             print("Selected ideas:")
             for i in answer:
-                print(f"date: {coincidences[int(i)-1][1:5]}-{coincidences[int(i)-1][5:7]}-{coincidences[int(i)-1][7:9]}, uuid: {coincidences[int(i)-1][14:20]}")
+                info = _parse_filename_info(coincidences[int(i)-1])
+                print(f"date: {info["date"]}, uuid: {info["uuid"]}")
 
             if _warning(data["warnings"]["ideas"]["delete"]): # FIXME: исправить текст, там this idea, надо these ideas
                 print("Deleting ideas...")
