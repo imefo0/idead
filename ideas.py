@@ -147,6 +147,7 @@ def test_new_idea(name, desc):
 # TODO: обновить ux всех remove и добавить флаг по триграммам
 # TODO: обновить способ поиска в remove
 # TODO: добавить поиск идеи по описанию в v0.7.0
+# FIXME: исправить косметический баг когда выводится в found 1+ ideas for name, :
 def remove_idea(date=None, time=None, uuid6=None, name=None):
     remove_idea_match_mode = data["settings"]["ideas"]["remove"].get("search_mode", "soft") # hard/soft
 

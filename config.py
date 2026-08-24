@@ -21,6 +21,7 @@ folder_guides = folder_data / "guides"
 
 # TODO: v0.7.0: добавить флаг --deleted в команду config reset который добавляет все удаленные (например случайно) настройки
 # TODO: заменить cancellation на другое слово
+# TODO: v0.7.0: добавить команду idead config check и idead config clippy и idead config format который проверяет все конфиги на правильность и правит их
 
 def get():
     with open(folder_config / "config.json", "r") as f:
@@ -69,8 +70,8 @@ def resolve_templates(obj, context=None):
     else:
         return obj
 
-def get_nested(data, keys, default=None): # возвращает default если пути нет в словаре
-    current = data
+def get_nested(input_data, keys, default=None): # возвращает default если пути нет в словаре
+    current = input_data
 
     for key in keys:
         if isinstance(current, dict) and key in current:
@@ -79,8 +80,8 @@ def get_nested(data, keys, default=None): # возвращает default есл�
             return default
     return current
 
-def set_nested(data, keys, value): # ставит значение value в пути, если не существует путь, создает его
-    current = data
+def set_nested(input_data, keys, value): # ставит значение value в пути, если не существует путь, создает его
+    current = input_data
 
     for key in keys[:-1]:
         if key not in current or not isinstance(current[key], dict):
@@ -88,18 +89,18 @@ def set_nested(data, keys, value): # ставит значение value в пу
         current = current[key]
 
     current[keys[-1]] = value
-    return data
+    return input_data
 
 def set_value(config_path, value):
     path = config_path.split(".")
 
     if get_nested(data, path) is not None:
-        data = set_nested(data, path, value)
+        output_data = set_nested(data, path, value)
     else:
         print("E: No Path Found")
 
     with open((folder_config / "config.json"), "w") as f:
-        json.dump(data, f, indent=4, ensure_ascii=False)
+        json.dump(output_data, f, indent=4, ensure_ascii=False)
 
     print(f"{config_path}: {value}")
 
