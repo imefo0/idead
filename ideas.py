@@ -6,7 +6,6 @@ import uuid
 data = get()
 
 # TODO: добавить город в метаданные идей и имя пользователя
-# TODO: добавить триграммы в search & remove
 
 class Idea:
     def __init__(self, name, desc):
@@ -45,7 +44,7 @@ def _warning(msg): # y, yes?, yn -> yes? [yn] y -> True
             return False
     return True
 
-def _clear_num(num_str): # WARN: FFP
+def _clear_num(num_str):
     return ''.join(filter(str.isdigit, num_str))
 
 def _get_vale_from_metadata(metadata: list(str), data_search: str) -> (bool, str):
@@ -145,10 +144,7 @@ def test_new_idea(name, desc):
 
 # TODO: обновить ux всех remove и добавить флаг по триграммам
 # TODO: обновить способ поиска в remove
-# TODO: добавить версию идеи 
 # TODO: добавить поиск идеи по описанию в v0.7.0
-# TODO: добавить настройку в конфиг (search name while deleting) на hard или soft (hard это '==' а soft это через триграммы)
-# FIXME: исправить splitlines()[1:-2] ведь если будут \n в desc то будет не правильно читать 
 def remove_idea(date=None, time=None, uuid6=None, name=None):
     remove_idea_match_mode = data["settings"]["ideas"]["remove"].get("search_mode", "soft") # hard/soft
 
