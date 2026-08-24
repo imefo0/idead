@@ -227,7 +227,7 @@ def remove_idea(date=None, time=None, uuid6=None, name=None):
         info = _parse_filename_info(coincidences[0])
         # TODO: добавить настройку чтобы выводились только определенные параметры или автоматически (в зависимости от введенных данных)
         print(f"Found 1 idea:\ndate: {info["date"]}, uuid: {info["uuid"]}")
-        if _warning(data["warnings"]["ideas"]["delete"]):
+        if _warning(data["warnings"]["ideas"]["delete"]["idea"]):
             print("Deleting idea...")
             (folder_ideas / info["filename"]).unlink()
     else: # много идей
@@ -252,7 +252,7 @@ def remove_idea(date=None, time=None, uuid6=None, name=None):
         if answer != 0 and answer != "0" and not isinstance(answer, list):
             info = _parse_filename_info(coincidences[answer-1])
             print(f"Selected idea:\ndate: {info["date"]}, uuid: {coincidences[answer-1][14:20]}")
-            if _warning(data["warnings"]["ideas"]["delete"]):
+            if _warning(data["warnings"]["ideas"]["delete"]["idea"]):
                 print("Deleting idea...")
                 (folder_ideas / coincidences[answer-1]).unlink()
         if isinstance(answer, list):
@@ -268,7 +268,7 @@ def remove_idea(date=None, time=None, uuid6=None, name=None):
                 info = _parse_filename_info(coincidences[int(i)-1])
                 print(f"date: {info["date"]}, uuid: {info["uuid"]}")
 
-            if _warning(data["warnings"]["ideas"]["delete"]): # FIXME: исправить текст, там this idea, надо these ideas
+            if _warning(data["warnings"]["ideas"]["delete"]["ideas"]):
                 print("Deleting ideas...")
                 for i in answer:
                     (folder_ideas / coincidences[int(i)-1]).unlink()
