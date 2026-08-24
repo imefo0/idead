@@ -425,4 +425,4 @@ def list_ideas(max_results=None):
     print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])
 
 if __name__ == "__main__":
-    remove_idea_by_date(input(), input())
+    print(_parse_filename_info(input()))

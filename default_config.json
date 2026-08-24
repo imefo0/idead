@@ -12,7 +12,8 @@
                 "score_style": "decimal"
             },
             "list": {
-                "max_results": -1
+                "max_results": -1,
+                "table_columns": ["number", "date", "time", "uuid", "version", "name"]
             },
             "remove": {
                 "search_mode": "soft"

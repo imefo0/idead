@@ -22,7 +22,7 @@ folder_guides = folder_data / "guides"
 # TODO: v0.7.0: добавить флаг --deleted в команду config reset который добавляет все удаленные (например случайно) настройки
 # TODO: заменить cancellation на другое слово
 # TODO: v0.7.0: добавить команду idead config check и idead config clippy и idead config format который проверяет все конфиги на правильность и правит их
-
+# TODO: v0.7.0 || v0.8.0: уйти из json
 def get():
     with open(folder_config / "config.json", "r") as f:
         return json.load(f)
