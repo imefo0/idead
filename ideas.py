@@ -2,7 +2,7 @@ from pathlib import Path
 from config import *
 from datetime import datetime
 import uuid
-from utils import *
+from utils import _warning
 
 data = get()
 
@@ -183,7 +183,7 @@ def remove_idea(date=None, time=None, uuid6=None, name=None):
             # 3. если совпадает uuid или если uuid не введен то продолжить
                 if uuid6 is None or uuid6 == candidate_uuid:
                     # 4. если совпадет имя и если спсоб hard то добавить в coincidences
-                    if (name is None or name == candidate_name) and remove_idea_match_mode == "hard":
+                    if name is None or (name == candidate_name and remove_idea_match_mode == "hard"):
                         coincidences.append(i)
                         continue
                     if remove_idea_match_mode != "hard":
