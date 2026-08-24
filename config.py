@@ -4,8 +4,7 @@ import re
 import subprocess
 import glob
 import update.config.update as updater
-
-# WARN: изменить везде пути на переменные
+from utils import _warning
 
 home = Path.home()
 
@@ -19,6 +18,15 @@ folder_ideas = folder_data / "ideas"
 folder_posts = folder_data / "posts"
 folder_tasks = folder_data / "tasks"
 folder_guides = folder_data / "guides"
+
+# TODO: v0.7.0: добавить флаг --deleted в команду config reset который добавляет все удаленные (например случайно) настройки
+# TODO: заменить cancellation на другое слово
+
+def get():
+    with open(folder_config / "config.json", "r") as f:
+        return json.load(f)
+
+data = get()
 
 def resolve_templates(obj, context=None):
     if context is None:
@@ -60,10 +68,6 @@ def resolve_templates(obj, context=None):
     # INFO: если не строка то возвращаем как есть
     else:
         return obj
-
-def get():
-    with open(folder_config / "config.json", "r") as f:
-        return json.load(f)
 
 def get_nested(data, keys, default=None): # возвращает default если пути нет в словаре
     current = data
