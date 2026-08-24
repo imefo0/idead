@@ -27,6 +27,11 @@
                 "idea": "Are you sure you want to delete this idea?",
                 "ideas": "Are you sure you want to delete these ideas?"
             }
+        },
+        "config": {
+            "update": "Are you sure you want to update the config?",
+            "reset_one": "Are you sure you want to reset this config setting?",
+            "reset_all": "Are you sure you want to reset ALL config settings?"
         }
     },
     "helper": {
