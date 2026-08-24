@@ -91,9 +91,6 @@ def set_nested(data, keys, value): # ставит значение value в пу
     return data
 
 def set_value(config_path, value):
-    with open((folder_config / "config.json"), "r") as f:
-        data = json.load(f)
-
     path = config_path.split(".")
 
     if get_nested(data, path) is not None:
@@ -107,9 +104,6 @@ def set_value(config_path, value):
     print(f"{config_path}: {value}")
 
 def get_value(config_path):
-    with open((folder_config / "config.json"), "r") as f:
-        data = json.load(f)
-
     path = config_path.split(".")
     value = get_nested(data, path)
     if value is not None:
@@ -119,8 +113,10 @@ def get_value(config_path):
         print("E: No Path Found")
 
 def reset_value(config_path):
-    with open((folder_config / "config.json"), "r") as f:
-        data = json.load(f)
+    if not _warning(data["warnings"]["config"]["reset_one"]):
+        print("Abort")
+        return
+
     with open((Path(__file__).parent / "default_config.json"), "r") as f:
         default_data = json.load(f)
 
@@ -132,14 +128,17 @@ def reset_value(config_path):
     else:
         print("E: No Path Found")
 
-
+# HACK: добавить "Отказ" в конфиг
+# TODO: функцию warning вставить в updater.main() лучше всего
 def update():
-    updater.main()
+    if _warning(data["warnings"]["config"]["update"]):
+        updater.main()
+    else: print("Abort")
 
 def reset_settings():
-    # INFO: открываем файл default_config.json и перемещаем в data
-    with open((Path(__file__).parent / "default_config.json"), "r") as f:
-        data = json.load(f)
+    if not _warning(data["warnings"]["config"]["reset_all"]):
+        print("Abort")
+        return
 
     # INFO: функция проходит по data и меняет {a.b.c.d} на настоящие имена
     resolved = resolve_templates(data)
@@ -152,7 +151,6 @@ def reset_settings():
 
     with open(config_path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
-
 
 def load_config():
     pass
