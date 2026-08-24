@@ -228,6 +228,8 @@ def remove_idea(date=None, time=None, uuid6=None, name=None):
         if _warning(data["warnings"]["ideas"]["delete"]["idea"]):
             print("Deleting idea...")
             (folder_ideas / info["filename"]).unlink()
+        else:
+            print("Abort")
     else: # много идей
         # TODO: добавить настройку столбцов таблицы
         print(f"Found {len(coincidences)} ideas for {f"{date}, " if date is not None else ""}{f"{time}, " if time is not None else ""}{f"{uuid6}, " if uuid6 is not None else ""}{f"{name}, " if name is not None else ""}:")
@@ -245,7 +247,7 @@ def remove_idea(date=None, time=None, uuid6=None, name=None):
         answer = answer[0] if len(answer) == 1 else answer
         if not isinstance(answer, list) and not answer.isdigit():
             print("E: Incorrect number")
-            print("Cancellation...")
+            print("Abort")
             answer = 0
         if answer != 0 and answer != "0" and not isinstance(answer, list):
             info = _parse_filename_info(coincidences[answer-1])
@@ -257,7 +259,7 @@ def remove_idea(date=None, time=None, uuid6=None, name=None):
             for i in answer:
                 if not i.isdigit():
                     print("E: Incorrect number")
-                    print("Cancellation...")
+                    print("Abort")
                     return
                 if i == "0":
                     return
