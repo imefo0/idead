@@ -2,6 +2,7 @@ from pathlib import Path
 from config import *
 from datetime import datetime
 import uuid
+from utils import *
 
 data = get()
 
@@ -34,15 +35,6 @@ def _get_list_of_files(folder):
             files.append(item.name)
 
     return files
-
-def _warning(msg): # y, yes?, yn -> yes? [yn] y -> True
-    if data["settings"]["all"]["warning_choice"]:
-        answer = input(f"{msg} [yn] ")
-        if answer.lower().replace(" ", "").replace("\t", "").replace("\n", "") in ["y", "yes"]:
-            return True
-        else:
-            return False
-    return True
 
 def _clear_num(num_str):
     return ''.join(filter(str.isdigit, num_str))
