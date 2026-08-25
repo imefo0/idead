@@ -5,6 +5,7 @@ import subprocess
 import glob
 import update.config.update as updater
 from utils import _warning
+import copy
 
 home = Path.home()
 
@@ -141,8 +142,11 @@ def reset_settings():
         print("Abort")
         return
 
+    with open((Path(__file__).parent / "default_config.json"), "r") as f:
+        default_data = json.load(f)
+
     # INFO: функция проходит по data и меняет {a.b.c.d} на настоящие имена
-    resolved = resolve_templates(data)
+    resolved = resolve_templates(default_data)
 
     # INFO: берем путь из resolved:paths.config (написал в кратком виде) и файл resolved.config.name
     config_path = folder_config / "config.json"
@@ -151,7 +155,7 @@ def reset_settings():
     config_path.parent.mkdir(parents=True, exist_ok=True)
 
     with open(config_path, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=4, ensure_ascii=False)
+        json.dump(default_data, f, indent=4, ensure_ascii=False)
 
 def load_config():
     pass
