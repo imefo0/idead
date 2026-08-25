@@ -393,36 +393,111 @@ def list_ideas(max_results=None):
     # TODO: добавить выравнивание
     # TODO: добавить проверку даты и uuid в названии файла а не только в метаданных
     # WARN: refactor
+    # TODO: добавить настройку которая означает "показывать ли столбцы в таблице"
     ideas = _get_list_of_files(folder_ideas)
 
     if not ideas:
         print("E: No Ideas Found")
         return
 
-    num = 1
+    number = 1
+
+    # INFO: логика лимита: если -1 то все показывать, иначе,
+    # количество которое указано но если оно больше чем общее количество то только все которые есть
     if max_results is not None: limit = max_results
     else:
         max_results_config = data["settings"]["ideas"]["list"].get("max_results", -1)
         limit = len(ideas) if max_results_config == -1 else max_results_config
     limit = min(limit, len(ideas))
 
+    """
+    # INFO: вывод шапки таблицы
     print(f"{"№":<{len(str(limit))+1}}    date    time   uuid  ver    name")
     print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])
+    """
 
+    # FIXME: длина разделяющая шапки меньше чем сами данные (надо сделать динамическую длину)
+    #"""
+    # NOTE: вывод шапки таблицы
+    for i in data["settings"]["ideas"]["list"]["table_columns"]:
+        if i == "number": print(f"{"№":<{len(str(limit))}}", end=" | ")
+        elif i == "date": print("   date   ", end=" | ")
+        elif i == "name": print("    name     ", end=" | ")
+        elif i == "desc": print(" description ", end=" | ")
+        elif i == "time": print("time ", end=" | ")
+        elif i == "uuid": print(" uuid ", end=" | ")
+        elif i == "version": print("ver", end=" | ") # FIXME: если версия будет больше 10, например 1.13 или 23.4, то будет неверный вывод
+        # WARN: добавить версию
+    print()
 
+    print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])
+
+    for i in ideas[:limit]:
+        # TODO: добавить настройку точки после № например если стоит true то будет "1." а если false то "1" в config
+        # WARN: добавить оптимизацию чтобы считались только те данные которые нужны
+        # WARN: dry
+
+        n = f"{number:>{len(str(limit))}}"
+        finfo = _parse_filename_info(i)
+        raw_content = (folder_ideas / i).read_text().splitlines()
+        fcontent = _extract_metadata_as_list(raw_content)
+
+        date = finfo["date"] #ideas[index][1:9]
+        # FIXME: если имя будет в 13 символов то нет смысла выводить name[:10] + "..."
+        # WARN: если имя будет тоже многострочное то будет ошибка (наверное)
+        if (name := _get_vale_from_metadata(fcontent, "name"))[0]: name = name[1]
+        else: name = "?????????????"
+
+        name = f"{name[:10]:<10}" + ("..." if len(name) > 10 else "   ")
+
+        sep_indices = [i for i, line in enumerate(raw_content) if line.strip() == "---"]
+
+        if len(sep_indices) >= 2:
+            desc_lines = raw_content[sep_indices[1] + 1:]
+        elif len(sep_indices) == 1:
+            desc_lines = raw_content[sep_indices[0] + 1:]
+        else:
+            desc_lines = raw_content
+
+        # TODO: добавить настройку этого разделителя: "; "
+        desc = "; ".join(desc_lines)
+        desc = f"{desc[:10]:<10}" + ("..." if len(desc) > 10 else "   ")
+
+        if (version := _get_vale_from_metadata(fcontent, "version"))[0]: version = version[1]
+        else: version = "?.?"
+        #version = "1.0" # HACK заглушка
+        time_t = finfo["time"]
+        uuid_t = finfo["uuid"]
+        #       1. 0.31 2026-08-08 this is a ...
+        # status:.1% -> 75.9% 
+        for i in data["settings"]["ideas"]["list"]["table_columns"]:
+            if i == "number": print(n, end=" | ")
+            elif i == "date": print(date, end=" | ")
+            elif i == "name": print(name, end=" | ")
+            elif i == "desc": print(desc, end=" | ")
+            elif i == "time": print(time_t, end=" | ")
+            elif i == "uuid": print(uuid_t, end=" | ")
+            elif i == "version": print(version, end=" | ")
+        print()
+        number += 1
+
+    #"""
+    """
     for i in ideas[:limit]:
         info = (folder_ideas / i).read_text().splitlines()
         #print(data)
         #      1. 2026-08-08 11:44 20d2aa 1.0 text
-        print(f"{f"{num:>{len(str(limit))}}"}. ", end="")
+        print(f"{f"{number:>{len(str(limit))}}"}. ", end="")
         print(f"{info[2][6:] if any("date" in line for line in info) else "????-??-?? ??:??"}", end=" ")
         print(f"{f"{info[3][6:]}" if any("uuid" in line for line in info) else "??????"}", end=" ")
         print(f"{f"{info[4][9:12]}" if any("version" in line for line in info) else "?.?"}", end=" ")
         print(f"{f"{info[1][6:16]}" if any("name" in line for line in info) else "??????????"}{"..." if len(info[1][6:]) >= 10 else ""}")
 
-        num += 1
+        number += 1
 
     print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])
+    """
+    # TODO: добавить настройку которая будет показывать или не будет эту линию и также будет ли она внизу или нет
 
 if __name__ == "__main__":
     print(_parse_filename_info(input()))
