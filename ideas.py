@@ -324,6 +324,30 @@ def _trigram_search(text: str, variants: list(str)) -> tuple((int, float)): # в
     ranked.sort(key=lambda x: x[1], reverse=True)
     return ranked
 
+# WARN: тестовое
+class Column:
+    def __init__(self, name: str, lines: list[str] = []):
+        self.name = name
+        self.lines = lines
+        self.width = 0
+
+        for line in [self.name, *self.lines]:
+            if (len_of_line := len(str(line))) > self.width: self.width = len_of_line
+
+    def __str__(self):
+        return f"Class Column:\nName: {self.name}\nWidth: {self.width}\nLines: {self.lines}"
+
+    def __repr__(self):
+        return f"{self.name}({self.width}): {self.lines}"
+
+    def __len__(self):
+        return len(self.lines)
+
+    def __getitem__(self, key):
+        try:
+            return self.lines[key]
+        except IndexError:
+            return "?"
 # NOTE: тут только по названию
 # WARN: refactor (срезы)
 # FIXME: n не используется
