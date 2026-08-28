@@ -7,6 +7,7 @@ from utils import _warning
 data = get()
 
 # TODO: добавить город в метаданные идей и имя пользователя
+# TODO: v0.7.0: разделить helper из config.json на config.json и helper.json а потом все равно перейти на toml (v0.8.0)
 
 class Idea:
     def __init__(self, name, desc):
@@ -324,6 +325,8 @@ def _trigram_search(text: str, variants: list(str)) -> tuple((int, float)): # в
     return ranked
 
 # NOTE: тут только по названию
+# WARN: refactor (срезы)
+# FIXME: n не используется
 def search_idea(text): # TODO: добавить поиск только по имени или только по описанию
     # TODO: добавить так чтобы можно было считать не по триграммам а можно по 2 буквам или по 3 буквам
     # TODO: добавить ограничение текста в config у name
@@ -499,5 +502,5 @@ def list_ideas(max_results=None):
     """
     # TODO: добавить настройку которая будет показывать или не будет эту линию и также будет ли она внизу или нет
 
-if __name__ == "__main__":
-    print(_parse_filename_info(input()))
+#if __name__ == "__main__":
+#    print(_parse_filename_info(input()))
