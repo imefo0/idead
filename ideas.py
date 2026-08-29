@@ -8,6 +8,7 @@ data = get()
 
 # TODO: добавить город в метаданные идей и имя пользователя
 # TODO: v0.7.0: разделить helper из config.json на config.json и helper.json а потом все равно перейти на toml (v0.8.0)
+# TODO: v0.7.0: изменить прямые обращения к config на переменные вначале функции
 
 class Idea:
     def __init__(self, name, desc):
@@ -458,10 +459,14 @@ def search_idea(text): # TODO: добавить поиск только по и�
         number += 1
 
 def list_ideas(max_results=None):
-    # TODO: добавить выравнивание
+    # TODO: добавить выравнивание - уже будет готово благодаря TR
     # TODO: добавить проверку даты и uuid в названии файла а не только в метаданных
-    # WARN: refactor
-    # TODO: добавить настройку которая означает "показывать ли столбцы в таблице"
+    # WARN: refactor - уже идет (v0.6.0 -> v0.7.0)
+    # TODO: добавить настройку которая означает "показывать ли столбцы в таблице" - уже есть: v0.7.0-dev (#42625e)
+    # теперь я буду помечать выполненые todo через #hesh_of_commit и версию когда добавленна но если приставка -dev, то
+    # добавленно именно во время разработки версии и она еще не вышла
+
+    # NOTE: это старый код который не требуется в рефакторинге
     ideas = _get_list_of_files(folder_ideas)
 
     if not ideas:
@@ -486,18 +491,106 @@ def list_ideas(max_results=None):
 
     # FIXME: длина разделяющая шапки меньше чем сами данные (надо сделать динамическую длину)
     #"""
+    
     # NOTE: вывод шапки таблицы
-    for i in data["settings"]["ideas"]["list"]["table_columns"]:
-        if i == "number": print(f"{"№":<{len(str(limit))}}", end=" | ")
-        elif i == "date": print("   date   ", end=" | ")
-        elif i == "name": print("    name     ", end=" | ")
-        elif i == "desc": print(" description ", end=" | ")
-        elif i == "time": print("time ", end=" | ")
-        elif i == "uuid": print(" uuid ", end=" | ")
-        elif i == "version": print("ver", end=" | ") # FIXME: если версия будет больше 10, например 1.13 или 23.4, то будет неверный вывод
-        # WARN: добавить версию
-    print()
+    #for i in data["settings"]["ideas"]["list"]["table_columns"]:
+        #if i == "number": print(f"{"№":<{len(str(limit))}}", end=" | ")
+        #elif i == "date": print("   date   ", end=" | ")
+        #elif i == "name": print("    name     ", end=" | ")
+        #elif i == "desc": print(" description ", end=" | ")
+        #elif i == "time": print("time ", end=" | ")
+        #elif i == "uuid": print(" uuid ", end=" | ")
+        #elif i == "version": print("ver", end=" | ") # FIXME: если версия будет больше 10, например 1.13 или 23.4, то будет неверный вывод
+        ## WARN: добавить версию
+    #print()
 
+    # NOTE: новый код, но с HACK
+
+    table_columns = data["settings"]["ideas"]["list"]["table_columns"]
+
+    description_list = []
+    columns_data = { # NOTE: защита от дурака есть, потому что в классе Column предусмотренно что если есть недостающие строки
+        "number": list(map(str, list(range(1, len(ideas[:limit])+1)))) if "number" in table_columns else [],
+        "date": [],
+        "name": [],
+        "description": description_list,
+        "desc": description_list,
+        "time": [],
+        "uuid": [],
+        "version": []
+    }
+    default_cols = { # TODO: v0.7.0: добавить эти все настройки в конфиг
+        # TODO: добавить type (i- - idea, g- guide и тд (префикс в файле))
+        "number": "№",
+        "date": "date",
+        "name": "name",
+        "description": "description", # TODO: v0.7.0: изменить в конфиге desc на description (ключ, не значение)
+        "desc": "description",
+        "time": "time",
+        "uuid": "uuid",
+        "version": "version"
+    }
+    # TODO: добавить настройку рядом table_columns которая убирает дубликаты
+
+    # INFO: zip нужно когда надо пройти по 2 спискам одновременно
+    # если надо до самого длинного то from itertools import zip_longest (недостающие значения заполняются None)
+    # WARN: если будет 10k-50k+ идей то раздуется память - не актуально (хотя...)
+    for idea in ideas[:limit]:
+        if any(x in ["date", "uuid", "time"] for x in table_columns):
+            finfo = _parse_filename_info(idea)
+            if "date" in table_columns: columns_data["date"].append(finfo["date"])
+            if "uuid" in table_columns: columns_data["uuid"].append(finfo["uuid"])
+            if "time" in table_columns: columns_data["time"].append(finfo["time"])
+
+        if any(x in ["name", "description", "desc", "version"] for x in table_columns):
+            raw_content = (folder_ideas / idea).read_text().splitlines()
+            fcontent = _extract_metadata_as_list(raw_content)
+
+            if "name" in table_columns:
+                if (name := _get_vale_from_metadata(fcontent, "name"))[0]:
+                    name = name[1]
+
+                    if len(name) > 13:
+                        name = f"{name[:10]}..."
+                    else:
+                        name = f"{name[:13]:<13}"
+                else: name = "?????????????"
+
+                columns_data["name"].append(name)
+            # INFO: ну нафиг эту поддержку - не актуально
+            if "description" in table_columns or "desc" in table_columns: # WARN: поддерживаем старый вариант
+                sep = [i for i, line in enumerate(raw_content) if line.strip() == "---"]
+
+                if len(sep) >= 2:
+                    desc_lines = raw_content[sep[1] + 1:]
+                elif len(sep) == 1:
+                    desc_lines = raw_content[sep[0] + 1:]
+                else:
+                    desc_lines = raw_content
+
+                desc = "; ".join(desc_lines) # TODO: добавить разделитель в конфиг
+
+                columns_data["description"].append(desc)
+
+            if "version" in table_columns: # TODO: добавить поддержку ver
+                if (version := _get_vale_from_metadata(fcontent, "version"))[0]: version = version[1]
+                else: version = "?.?"
+
+                columns_data["version"].append(version)
+
+    columns = []
+    for column in filter(lambda x: x in default_cols, table_columns):
+        columns.append(Column(default_cols[column], columns_data[column]))
+
+    table = TableRenderer(columns)
+    print(table.render())
+
+    # TODO: удалить separator_length
+
+    # NOTE: старый код который надо потом удалить, причина почему не могу сейчас, потому что он считает все данные по номерам
+    # то есть по строкам, а надо по столбцам, потому что логика таблицы изменилась и ее надо кормить столбиками,
+    # а не строками как раньше без ооп
+    """
     print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])
 
     for i in ideas[:limit]:
@@ -549,7 +642,8 @@ def list_ideas(max_results=None):
         print()
         number += 1
 
-    #"""
+    """
+
     """
     for i in ideas[:limit]:
         info = (folder_ideas / i).read_text().splitlines()
