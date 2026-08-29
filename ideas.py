@@ -325,11 +325,13 @@ def _trigram_search(text: str, variants: list(str)) -> tuple((int, float)): # в
     return ranked
 
 # WARN: тестовое
+
 class Column:
     def __init__(self, name: str, lines: list[str] = []):
         self.name = name
         self.lines = lines
         self.width = 0
+        self.no_column_found_symbol = "-"
 
         for line in [self.name, *self.lines]:
             if (len_of_line := len(str(line))) > self.width: self.width = len_of_line
@@ -347,7 +349,8 @@ class Column:
         try:
             return self.lines[key]
         except IndexError:
-            return "?"
+            return self.no_column_found_symbol
+
 # NOTE: тут только по названию
 # WARN: refactor (срезы)
 # FIXME: n не используется
