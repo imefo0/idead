@@ -351,6 +351,44 @@ class Column:
         except IndexError:
             return self.no_column_found_symbol
 
+class TableRenderer:
+    def __init__(self, columns: list[Column] = []):
+        self.columns = columns
+        self.column_separator = " | "
+        self.column_separator_start = ""
+        self.column_separator_end = ""
+        self.line_separator = "-"
+        # TODO: добавить переменную пересечения,
+        # типа если полоса строки пересечется с полосой колонки то написать вместо l_sep наод "+" или другую строку
+
+    def __str__(self):
+        columns = "\n\t".join([repr(x) for x in self.columns])
+        return f"Class TableRenderer\nColumns:\n\t{columns}"
+
+    def render(self):
+        result = ""
+
+        cells = [f"{column.name:^{column.width}}" for column in self.columns]
+        text = self.column_separator_start + (self.column_separator).join(cells) + self.column_separator_end
+
+        result += text + "\n"
+        result += (len(text) * self.line_separator) + "\n"
+
+        max_index = max([len(column) for column in self.columns])
+        #print(max_index)
+
+        for x in range(max_index):
+            result += self.column_separator_start
+            for index, column in enumerate(self.columns):
+                result += f"{column[x]:^{column.width}}" + (self.column_separator_end + "\n" if index+1 == len(self.columns) else self.column_separator)
+
+        return result
+if __name__ == "__main__":
+    table = TableRenderer([Column(x, ["1", "2", "34", "123456"]) for x in ["name", "test", "desc", "testing", "a"]] + [Column("abc", "a")])
+    print(table)
+    #print(len(table.columns))
+    print(table.render())
+
 # NOTE: тут только по названию
 # WARN: refactor (срезы)
 # FIXME: n не используется
