@@ -366,6 +366,14 @@ class TableRenderer:
         columns = "\n\t".join([repr(x) for x in self.columns])
         return f"Class TableRenderer\nColumns:\n\t{columns}"
 
+    def config(self, **kwargs):
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+            else:
+                raise AttributeError(f"TableRenderer has no attribute '{key}'")
+        return self
+
     def render(self):
         result = ""
 
