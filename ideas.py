@@ -50,7 +50,7 @@ def _get_vale_from_metadata(metadata: list(str), data_search: str) -> (bool, str
             return True, value
 
     # Не найдено
-    print("E: Name In Idea Not Found")
+    print("WARN: Name In Idea Not Found")
     return False, None
 
 def _extract_metadata_as_list(lines):
