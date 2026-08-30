@@ -14,6 +14,15 @@
             "list": {
                 "max_results": -1,
                 "table_columns": ["number", "date", "time", "uuid", "version", "name"],
+                "etc": {
+                    "description": "..."
+                },
+                "max_symbols": {
+                    "auto": {
+                        "description": false
+                    },
+                    "description": 13
+                },
                 "separator": {
                     "line": "-",
                     "column_middle": " | ",

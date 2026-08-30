@@ -591,6 +591,17 @@ def list_ideas(max_results=None):
 
                 desc = "; ".join(desc_lines) # TODO: добавить разделитель в конфиг
 
+                auto = data["settings"]["ideas"]["list"]["max_symbols"]["auto"]["description"]
+                etc = data["settings"]["ideas"]["list"]["etc"]["description"]
+                if not auto:
+                    max_symbols_of_desc = data["settings"]["ideas"]["list"]["max_symbols"]["description"]
+                    if len(desc) > max_symbols_of_desc:
+                        desc = f"{desc[:max_symbols_of_desc - len(etc)]}{etc}"
+                else:
+                    max_symbols_of_col = len(default_cols["description"])
+                    if len(desc) > max_symbols_of_col:
+                        desc = f"{desc[:max_symbols_of_col - len(etc)]}{etc}"
+
                 columns_data["description"].append(desc)
 
             if "version" in table_columns: # TODO: добавить поддержку ver
