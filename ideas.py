@@ -215,8 +215,8 @@ def remove_idea(date=None, time=None, uuid6=None, name=None):
         tmp_coincidences = coincidences.copy()
         coincidences = []
         for idx, score in weights:
-            print(idx, score)
-            print(tmp_coincidences[idx])
+            #print(idx, score)
+            #print(tmp_coincidences[idx])
             coincidences.append(tmp_coincidences[idx])
 
     # TODO: добавить выравнивание у №, добавить настройку столбцов, добавить max_results
