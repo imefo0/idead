@@ -13,6 +13,7 @@
             },
             "list": {
                 "max_results": -1,
+                "separator_description": "; ",
                 "table_columns": ["number", "date", "time", "uuid", "version", "name"],
                 "etc": {
                     "name": "...",

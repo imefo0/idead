@@ -599,8 +599,9 @@ def list_ideas(max_results=None):
                     desc_lines = raw_content[sep[0] + 1:]
                 else:
                     desc_lines = raw_content
-
-                desc = "; ".join(desc_lines) # TODO: добавить разделитель в конфиг
+                # WARN: до v0.7.0: если значения не будет то тогда писать предупреждение что ее нет и ставить из default_config.json 
+                separator_description = data["settings"]["ideas"]["list"]["separator_description"]
+                desc = separator_description.join(desc_lines) # TODO: добавить разделитель в конфиг - добавлено
 
                 auto = data["settings"]["ideas"]["list"]["max_symbols"]["auto"]["description"]
                 etc = data["settings"]["ideas"]["list"]["etc"]["description"]
