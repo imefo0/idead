@@ -9,6 +9,7 @@ data = get()
 # TODO: добавить город в метаданные идей и имя пользователя
 # TODO: v0.7.0: разделить helper из config.json на config.json и helper.json а потом все равно перейти на toml (v0.8.0)
 # TODO: v0.7.0: изменить прямые обращения к config на переменные вначале функции
+# TODO: изменить пасхалку на нормальный хелпер в idead --help
 
 class Idea:
     def __init__(self, name, desc):
@@ -359,6 +360,9 @@ class TableRenderer:
         self.column_separator_start = ""
         self.column_separator_end = ""
         self.line_separator = "-"
+        self.is_line_separator_end = False
+        self.is_line_separator_start = True
+        self.is_line_separator_middle = False
         # TODO: добавить переменную пересечения,
         # типа если полоса строки пересечется с полосой колонки то написать вместо l_sep наод "+" или другую строку
 
@@ -380,8 +384,9 @@ class TableRenderer:
         cells = [f"{column.name:^{column.width}}" for column in self.columns]
         text = self.column_separator_start + (self.column_separator).join(cells) + self.column_separator_end
 
+        if self.is_line_separator_start: result += (len(text) * self.line_separator) + "\n"
         result += text + "\n"
-        result += (len(text) * self.line_separator) + "\n"
+        if self.is_line_separator_middle: result += (len(text) * self.line_separator) + "\n"
 
         max_index = max([len(column) for column in self.columns])
         #print(max_index)
@@ -391,12 +396,20 @@ class TableRenderer:
             for index, column in enumerate(self.columns):
                 result += f"{column[x]:^{column.width}}" + (self.column_separator_end + "\n" if index+1 == len(self.columns) else self.column_separator)
 
+        if self.is_line_separator_end: result += (len(text) * self.line_separator) + "\n"
+
         return result
+
 if __name__ == "__main__":
-    table = TableRenderer([Column(x, ["1", "2", "34", "123456"]) for x in ["name", "test", "desc", "testing", "a"]] + [Column("abc", "a")])
-    print(table)
+    col1 = Column("name")     # lines = []
+    col2 = Column("test")     # lines = [] (этот же список!)
+    col1.lines.append("hello")
+    print(col2.lines)  # ['hello']  # 💀 БАГ!
+
+    #table = TableRenderer([Column(x, ["1", "2", "34", "123456"]) for x in ["name", "test", "desc", "testing", "a"]] + [Column("abc", "a")])
+    #print(table)
     #print(len(table.columns))
-    print(table.render())
+    #print(table.render())
 
 # NOTE: тут только по названию
 # WARN: refactor (срезы)

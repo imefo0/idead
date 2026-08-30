@@ -13,7 +13,16 @@
             },
             "list": {
                 "max_results": -1,
-                "table_columns": ["number", "date", "time", "uuid", "version", "name"]
+                "table_columns": ["number", "date", "time", "uuid", "version", "name"],
+                "separator": {
+                    "line": "-",
+                    "column_middle": " | ",
+                    "column_end": " |",
+                    "column_start": "| ",
+                    "line_start": false,
+                    "line_end": false,
+                    "line_middle": true
+                }
             },
             "remove": {
                 "search_mode": "soft"
