@@ -15,12 +15,15 @@
                 "max_results": -1,
                 "table_columns": ["number", "date", "time", "uuid", "version", "name"],
                 "etc": {
+                    "name": "...",
                     "description": "..."
                 },
                 "max_symbols": {
                     "auto": {
+                        "name": false,
                         "description": false
                     },
+                    "name": 13,
                     "description": 13
                 },
                 "separator": {
