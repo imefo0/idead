@@ -603,7 +603,16 @@ def list_ideas(max_results=None):
     for column in filter(lambda x: x in default_cols, table_columns):
         columns.append(Column(default_cols[column], columns_data[column]))
 
-    table = TableRenderer(columns)
+    sep_settings = data["settings"]["ideas"]["list"]["separator"]
+    table = TableRenderer(columns).config(
+        line_separator = sep_settings["line"],
+        column_separator = sep_settings["column_middle"],
+        column_separator_end = sep_settings["column_end"],
+        column_separator_start = sep_settings["column_start"],
+        is_line_separator_start = sep_settings["line_start"],
+        is_line_separator_middle = sep_settings["line_middle"],
+        is_line_separator_end = sep_settings["line_end"]
+    )
     print(table.render())
 
     # TODO: удалить separator_length
