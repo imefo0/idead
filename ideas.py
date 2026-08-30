@@ -328,9 +328,9 @@ def _trigram_search(text: str, variants: list(str)) -> tuple((int, float)): # в
 # WARN: тестовое
 
 class Column:
-    def __init__(self, name: str, lines: list[str] = []):
+    def __init__(self, name: str, lines: list[str] = None):
         self.name = name
-        self.lines = lines
+        self.lines = lines if lines is not None else []
         self.width = 0
         self.no_column_found_symbol = "-"
 
