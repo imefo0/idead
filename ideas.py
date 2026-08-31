@@ -405,7 +405,7 @@ if __name__ == "__main__":
     col1 = Column("name")     # lines = []
     col2 = Column("test")     # lines = [] (этот же список!)
     col1.lines.append("hello")
-    print(col2.lines)  # ['hello']  # 💀 БАГ!
+    print(col2.lines)  # ['hello']  # БАГ!
 
     #table = TableRenderer([Column(x, ["1", "2", "34", "123456"]) for x in ["name", "test", "desc", "testing", "a"]] + [Column("abc", "a")])
     #print(table)
@@ -526,7 +526,7 @@ def list_ideas(max_results=None):
         ## WARN: добавить версию
     #print()
 
-    # NOTE: новый код, но с HACK
+    # NOTE: новый код, и БЕЗ HACK
 
     table_columns = data["settings"]["ideas"]["list"]["table_columns"]
 

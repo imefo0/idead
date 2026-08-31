@@ -8,8 +8,30 @@
         "ideas": {
             "search": {
                 "max_results": 5,
+                "separator_description": "; ",
                 "table_columns": ["number", "score", "date", "name"],
-                "score_style": "decimal"
+                "score_style": "decimal",
+                "etc": {
+                    "name": "...",
+                    "description": "..."
+                },
+                "max_symbols": {
+                    "auto": {
+                        "name": false,
+                        "description": false
+                    },
+                    "name": 13,
+                    "description": 13
+                    },
+                    "separator": {
+                        "line": "-",
+                        "column_middle": " | ",
+                        "column_end": " |",
+                        "column_start": "| ",
+                        "line_start": false,
+                        "line_end": false,
+                        "line_middle": true
+                    }
             },
             "list": {
                 "max_results": -1,
