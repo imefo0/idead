@@ -42,7 +42,7 @@ def _get_list_of_files(folder):
 def _clear_num(num_str):
     return ''.join(filter(str.isdigit, num_str))
 
-def _get_vale_from_metadata(metadata: list(str), data_search: str) -> (bool, str):
+def _get_value_from_metadata(metadata: list(str), data_search: str) -> (bool, str):
     prefix = f"{data_search}: "
 
     for item in metadata:
@@ -163,7 +163,7 @@ def remove_idea(date=None, time=None, uuid6=None, name=None):
 
     coincidences = []
     files = _get_list_of_files(folder_ideas)
-    names = [_get_vale_from_metadata(_extract_metadata_as_list((folder_ideas / x).read_text().splitlines()), "name") for x in files]
+    names = [_get_value_from_metadata(_extract_metadata_as_list((folder_ideas / x).read_text().splitlines()), "name") for x in files]
     weights = []
 
     # проходимся по каждому файлу
@@ -173,7 +173,7 @@ def remove_idea(date=None, time=None, uuid6=None, name=None):
         candidate_date = i[1:9]
         candidate_time = i[9:13]
         candidate_uuid = i[14:20]
-        result = _get_vale_from_metadata(_extract_metadata_as_list((folder_ideas / i).read_text().splitlines()), "name")
+        result = _get_value_from_metadata(_extract_metadata_as_list((folder_ideas / i).read_text().splitlines()), "name")
         if not result[0]:
             print(f"WARN: No Name In Idea (uuid: {candidate_uuid}) Found")
             continue
@@ -569,7 +569,7 @@ def list_ideas(max_results=None):
             fcontent = _extract_metadata_as_list(raw_content)
 
             if "name" in table_columns:
-                if (name := _get_vale_from_metadata(fcontent, "name"))[0]:
+                if (name := _get_value_from_metadata(fcontent, "name"))[0]:
                     name = name[1]
 
                     auto = data["settings"]["ideas"]["list"]["max_symbols"]["auto"]["name"]
@@ -618,7 +618,7 @@ def list_ideas(max_results=None):
                 columns_data["description"].append(desc)
 
             if "version" in table_columns: # TODO: добавить поддержку ver
-                if (version := _get_vale_from_metadata(fcontent, "version"))[0]: version = version[1]
+                if (version := _get_value_from_metadata(fcontent, "version"))[0]: version = version[1]
                 else: version = "?.?"
 
                 columns_data["version"].append(version)
@@ -660,7 +660,7 @@ def list_ideas(max_results=None):
         date = finfo["date"] #ideas[index][1:9]
         # FIXME: если имя будет в 13 символов то нет смысла выводить name[:10] + "..."
         # WARN: если имя будет тоже многострочное то будет ошибка (наверное)
-        if (name := _get_vale_from_metadata(fcontent, "name"))[0]: name = name[1]
+        if (name := _get_value_from_metadata(fcontent, "name"))[0]: name = name[1]
         else: name = "?????????????"
 
         name = f"{name[:10]:<10}" + ("..." if len(name) > 10 else "   ")
@@ -678,7 +678,7 @@ def list_ideas(max_results=None):
         desc = "; ".join(desc_lines)
         desc = f"{desc[:10]:<10}" + ("..." if len(desc) > 10 else "   ")
 
-        if (version := _get_vale_from_metadata(fcontent, "version"))[0]: version = version[1]
+        if (version := _get_value_from_metadata(fcontent, "version"))[0]: version = version[1]
         else: version = "?.?"
         #version = "1.0" # HACK заглушка
         time_t = finfo["time"]
