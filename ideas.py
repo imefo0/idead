@@ -354,8 +354,9 @@ class Column:
             return self.no_column_found_symbol
 
 class TableRenderer:
-    def __init__(self, columns: list[Column] = []):
-        self.columns = columns
+    # WARN: НИКОГДА НЕ ПЕРЕДАВАТЬ СПИСОК КАК ОБЫЧНЕ ЗНАЧЕНИЕ В ПАРАМЕТРАХ
+    def __init__(self, columns: list[Column] = None):
+        self.columns = columns if columns is not None else []
         self.column_separator = " | "
         self.column_separator_start = ""
         self.column_separator_end = ""
