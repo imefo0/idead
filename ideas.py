@@ -536,11 +536,17 @@ def list_ideas(max_results=None):
 
     # INFO: логика лимита: если -1 то все показывать, иначе,
     # количество которое указано но если оно больше чем общее количество то только все которые есть
-    if max_results is not None: limit = max_results
-    else:
-        max_results_config = data["settings"]["ideas"]["list"].get("max_results", -1)
-        limit = len(ideas) if max_results_config == -1 else max_results_config
-    limit = min(limit, len(ideas))
+    #if max_results is not None: limit = max_results
+    #else:
+        #max_results_config = data["settings"]["ideas"]["list"].get("max_results", -1)
+        #limit = len(ideas) if max_results_config == -1 else max_results_config
+    #limit = min(limit, len(ideas))
+    limit = _determine_limit(
+        max_results,
+        ideas,
+        default = data["settings"]["ideas"]["list"].get("max_results", -1)
+    )
+    #print(limit)
 
     """
     # INFO: вывод шапки таблицы
