@@ -615,24 +615,20 @@ def list_ideas(max_results=None):
                 if (name := _get_value_from_metadata(fcontent, "name"))[0]:
                     name = name[1]
 
-                    auto = data["settings"]["ideas"]["list"]["max_symbols"]["auto"]["name"]
-                    etc = data["settings"]["ideas"]["list"]["etc"]["name"] #"..."
-                    if not auto:
-                        max_symbols_of_name = data["settings"]["ideas"]["list"]["max_symbols"]["name"]
-                        if len(name) > max_symbols_of_name:
-                            name = f"{name[:max_symbols_of_name - len(etc)]}{etc}"
-                    else:
+                    columns_data["name"].append(format_field(
+                        name,
+                        auto = data["settings"]["ideas"]["list"]["max_symbols"]["auto"]["name"],
+                        etc = data["settings"]["ideas"]["list"]["etc"]["name"],
+                        max_symbols_of_field = data["settings"]["ideas"]["list"]["max_symbols"]["name"],
                         max_symbols_of_col = len(default_cols["name"])
-                        if len(name) > max_symbols_of_col:
-                            name = f"{name[:max_symbols_of_col - len(etc)]}{etc}"
-
+                    ))
                 else:
                     auto = data["settings"]["ideas"]["list"]["max_symbols"]["auto"]["name"]
                     max_symbols_of_name = data["settings"]["ideas"]["list"]["max_symbols"]["name"]
                     max_symbols_of_col = len(default_cols["name"])
                     name = "?" * (max_symbols_of_name if not auto else max_symbols_of_col)
 
-                columns_data["name"].append(name)
+                    columns_data["name"].append(name)
             # INFO: ну нафиг эту поддержку - не актуально
             if "description" in table_columns or "desc" in table_columns: # WARN: поддерживаем старый вариант
                 sep = [i for i, line in enumerate(raw_content) if line.strip() == "---"]
