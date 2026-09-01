@@ -456,35 +456,147 @@ def search_idea(text): # TODO: добавить поиск только по и�
     # TODO: добавить так чтобы можно было считать не по триграммам а можно по 2 буквам или по 3 буквам
     # TODO: добавить ограничение текста в config у name
     # получить список текстов
+    # NOTE: вся логика поиска тут
     ideas = _get_list_of_files(folder_ideas)
     variants = []
-    descs = []
-    uuids = []
+    #descs = []
+    #uuids = []
     for i in ideas:
         info = (folder_ideas / i).read_text().splitlines()[1][6:]
         variants.append(info)
-        descs.append((folder_ideas / i).read_text().splitlines()[6])
-        uuids.append((folder_ideas / i).read_text().splitlines()[3])
-
-    max_number = data["settings"]["ideas"]["search"]["max_results"]
+    #descs.append((folder_ideas / i).read_text().splitlines()[6])
+    #uuids.append((folder_ideas / i).read_text().splitlines()[3])
+    #
+    #max_number = data["settings"]["ideas"]["search"]["max_results"]
 
     # сделать поиск
-    search_status = _trigram_search(text, variants)
+    ideas_scores = _trigram_search(text, variants)
+    # ideas
     # вывести результаты
-    number = 1
+    #number = 1
 
-    for i in data["settings"]["ideas"]["search"]["table_columns"]:
-        if i == "number": print(f"{" "*(len(str(min(max_number, len(search_status))))-1)}№", end=" ")
-        elif i == "score": print("scr.", end=" ")
-        elif i == "date": print("   date   ", end=" ") 
-        elif i == "name": print("    name     ", end=" ")
-        elif i == "desc": print(" description ", end=" ")
-        elif i == "time": print("time ", end=" ")
-        elif i == "uuid": print(" uuid ", end=" ")
-    print()
+    # INFO: надо полчить на вход список (уверенности и оценки) и тот же список но уже с названиями файлов
 
-    print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])
 
+    limit = _determine_limit(
+        data["settings"]["ideas"]["search"]["max_results"],
+        ideas_scores,
+        default = data["settings"]["ideas"]["search"].get("max_results", -1)
+    )
+
+    table_columns = data["settings"]["ideas"]["search"]["table_columns"]
+
+    description_list = []
+    columns_data = { # NOTE: защита от дурака есть, потому что в классе Column предусмотренно что если есть недостающие строки
+        "number": list(map(str, list(range(1, len(ideas[:limit])+1)))) if "number" in table_columns else [],
+        "score": [],
+        "date": [],
+        "name": [],
+        "description": description_list,
+        "desc": description_list,
+        "time": [],
+        "uuid": [],
+        "version": []
+    }
+    default_cols = { # TODO: v0.7.0: добавить эти все настройки в конфиг
+        # TODO: добавить type (i- - idea, g- guide и тд (префикс в файле))
+        "number": "№",
+        "date": "date",
+        "name": "name",
+        "description": "description", # TODO: v0.7.0: изменить в конфиге desc на description (ключ, не значение)
+        "desc": "description",
+        "time": "time",
+        "uuid": "uuid",
+        "version": "version",
+        "score": "score"
+    }
+    # TODO: v0.7.0; добавить настройку рядом table_columns которая убирает дубликаты
+
+    # INFO: zip нужно когда надо пройти по 2 спискам одновременно
+    # если надо до самого длинного то from itertools import zip_longest (недостающие значения заполняются None)
+    # WARN: если будет 10k-50k+ идей то раздуется память - не актуально (хотя...)
+    for index, score in ideas_scores[:limit]:
+        if any(x in ["date", "uuid", "time"] for x in table_columns):
+            finfo = _parse_filename_info(ideas[index])
+            if "date" in table_columns: columns_data["date"].append(finfo["date"])
+            if "uuid" in table_columns: columns_data["uuid"].append(finfo["uuid"])
+            if "time" in table_columns: columns_data["time"].append(finfo["time"])
+
+        if "score" in table_columns:
+            columns_data["score"].append(score)
+
+        if any(x in ["name", "description", "desc", "version"] for x in table_columns):
+            raw_content = (folder_ideas / ideas[index]).read_text().splitlines()
+            fcontent = _extract_metadata_as_list(raw_content)
+
+            if "name" in table_columns:
+                if (name := _get_value_from_metadata(fcontent, "name"))[0]:
+                    name = name[1]
+
+                    columns_data["name"].append(format_field(
+                        name,
+                        auto = data["settings"]["ideas"]["search"]["max_symbols"]["auto"]["name"],
+                        etc = data["settings"]["ideas"]["search"]["etc"]["name"],
+                        max_symbols_of_field = data["settings"]["ideas"]["search"]["max_symbols"]["name"],
+                        max_symbols_of_col = len(default_cols["name"])
+                    ))
+                else:
+                    auto = data["settings"]["ideas"]["search"]["max_symbols"]["auto"]["name"]
+                    max_symbols_of_name = data["settings"]["ideas"]["search"]["max_symbols"]["name"]
+                    max_symbols_of_col = len(default_cols["name"])
+                    name = "?" * (max_symbols_of_name if not auto else max_symbols_of_col)
+
+                    columns_data["name"].append(name)
+            if "description" in table_columns or "desc" in table_columns: # WARN: поддерживаем старый вариант
+                desc_lines = _extract_description(raw_content)
+
+                # WARN: до v0.7.0: если значения не будет то тогда писать предупреждение что ее нет и ставить из default_config.json 
+                columns_data["description"].append(format_field(
+                    desc_lines,
+                    auto = data["settings"]["ideas"]["search"]["max_symbols"]["auto"]["description"],
+                    etc = data["settings"]["ideas"]["search"]["etc"]["description"],
+                    sep = data["settings"]["ideas"]["search"]["separator_description"],
+                    max_symbols_of_field = data["settings"]["ideas"]["search"]["max_symbols"]["description"],
+                    max_symbols_of_col = len(default_cols["description"])
+                ))
+
+            if "version" in table_columns: # TODO: добавить поддержку ver
+                if (version := _get_value_from_metadata(fcontent, "version"))[0]: version = version[1]
+                else: version = "?.?"
+
+                columns_data["version"].append(version)
+
+    columns = []
+    for column in filter(lambda x: x in default_cols, table_columns):
+        columns.append(Column(default_cols[column], columns_data[column]))
+
+    sep_settings = data["settings"]["ideas"]["search"]["separator"]
+    #print(sep_settings)
+    table = TableRenderer(columns).config(
+        line_separator = sep_settings["line"],
+        column_separator = sep_settings["column_middle"],
+        column_separator_end = sep_settings["column_end"],
+        column_separator_start = sep_settings["column_start"],
+        is_line_separator_start = sep_settings["line_start"],
+        is_line_separator_middle = sep_settings["line_middle"],
+        is_line_separator_end = sep_settings["line_end"]
+    )
+    print(table.render())
+    
+
+    #for i in data["settings"]["ideas"]["search"]["table_columns"]:
+    #    if i == "number": print(f"{" "*(len(str(min(max_number, len(search_status))))-1)}№", end=" ")
+    #    elif i == "score": print("scr.", end=" ")
+    #    elif i == "date": print("   date   ", end=" ") 
+    #    elif i == "name": print("    name     ", end=" ")
+    #    elif i == "desc": print(" description ", end=" ")
+    #    elif i == "time": print("time ", end=" ")
+    #    elif i == "uuid": print(" uuid ", end=" ")
+    #print()
+
+    #print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])
+
+    """
     for index, status in search_status[:min(max_number, len(search_status))]:
         # TODO: добавить настройку точки после № например если стоит true то будет "1." а если false то "1" в config
         # WARN: добавить оптимизацию чтобы считались только те данные которые нужны
@@ -516,6 +628,7 @@ def search_idea(text): # TODO: добавить поиск только по и�
             elif i == "uuid": print(uuid_t, end=" ")
         print()
         number += 1
+    """
 
 def list_ideas(max_results=None):
     # TODO: добавить выравнивание - уже будет готово благодаря TR
