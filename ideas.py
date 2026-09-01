@@ -328,6 +328,35 @@ def _trigram_search(text: str, variants: list(str)) -> tuple((int, float)): # в
 
 # WARN: тестовое
 
+def _extract_description(raw_content: list[str]) -> list[str]:
+    sep = [i for i, line in enumerate(raw_content) if line.strip() == "---"]
+
+    if len(sep) >= 2:
+        return raw_content[sep[1] + 1:]
+    elif len(sep) == 1:
+        return raw_content[sep[0] + 1:]
+    else:
+        return raw_content
+
+def format_field(field_lines: list[str] | str, *, auto: bool, sep: str = "", etc: str, max_symbols_of_field: int, max_symbols_of_col: int) -> str:
+    field = sep.join(field_lines if isinstance(field_lines, list) else [field_lines]) # TODO: добавить разделитель в конфиг - добавлено
+
+    if not auto:
+        if len(field) > max_symbols_of_field:
+            field = f"{field[:max_symbols_of_field - len(etc)]}{etc}"
+    else:
+        if len(field) > max_symbols_of_col:
+            field = f"{field[:max_symbols_of_col - len(etc)]}{etc}"
+
+    return field
+
+def _determine_limit(limit: int, lst: list, *, default=-1) -> int:
+    if limit is None:
+        if default <= -1:
+            return len(lst)
+        return default
+    return min((len(lst) if limit <= -1 else limit), len(lst))
+
 class Column:
     def __init__(self, name: str, lines: list[str] = None):
         self.name = name
