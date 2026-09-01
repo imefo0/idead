@@ -8,7 +8,59 @@
         "ideas": {
             "search": {
                 "max_results": 5,
-                "table_columns": ["number", "score", "date", "name"]
+                "separator_description": "; ",
+                "table_columns": ["number", "score", "date", "name"],
+                "score_style": "decimal",
+                "etc": {
+                    "name": "...",
+                    "description": "..."
+                },
+                "max_symbols": {
+                    "auto": {
+                        "name": false,
+                        "description": false
+                    },
+                    "name": 13,
+                    "description": 13
+                    },
+                "separator": {
+                    "line": "-",
+                    "column_middle": " | ",
+                    "column_end": " |",
+                    "column_start": "| ",
+                    "line_start": false,
+                    "line_end": false,
+                    "line_middle": true
+                }
+            },
+            "list": {
+                "max_results": -1,
+                "separator_description": "; ",
+                "table_columns": ["number", "date", "time", "uuid", "version", "name"],
+                "etc": {
+                    "name": "...",
+                    "description": "..."
+                },
+                "max_symbols": {
+                    "auto": {
+                        "name": false,
+                        "description": false
+                    },
+                    "name": 13,
+                    "description": 13
+                },
+                "separator": {
+                    "line": "-",
+                    "column_middle": " | ",
+                    "column_end": " |",
+                    "column_start": "| ",
+                    "line_start": false,
+                    "line_end": false,
+                    "line_middle": true
+                }
+            },
+            "remove": {
+                "search_mode": "soft"
             },
             "version": "1.0",
             "format": "md"
@@ -16,7 +68,15 @@
     },
     "warnings": {
         "ideas": {
-            "delete": "Are you sure you want to delete this idea?"
+            "delete": {
+                "idea": "Are you sure you want to delete this idea?",
+                "ideas": "Are you sure you want to delete these ideas?"
+            }
+        },
+        "config": {
+            "update": "Are you sure you want to update the config?",
+            "reset_one": "Are you sure you want to reset this config setting?",
+            "reset_all": "Are you sure you want to reset ALL config settings?"
         }
     },
     "helper": {
@@ -126,7 +186,7 @@
         }
     },
     "config": {
-        "version": "1.3"
+        "version": "2.0"
     }
 }
 

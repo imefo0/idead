@@ -4,8 +4,8 @@ import re
 import subprocess
 import glob
 import update.config.update as updater
-
-# WARN: изменить везде пути на переменные
+from utils import _warning
+import copy
 
 home = Path.home()
 
@@ -19,6 +19,18 @@ folder_ideas = folder_data / "ideas"
 folder_posts = folder_data / "posts"
 folder_tasks = folder_data / "tasks"
 folder_guides = folder_data / "guides"
+
+# TODO: v0.7.0: добавить флаг --deleted в команду config reset который добавляет все удаленные (например случайно) настройки
+# TODO: заменить cancellation на другое слово
+# TODO: v0.7.0: добавить команду idead config check и
+# idead config clippy и idead config format который проверяет все конфиги на правильность и правит их
+# TODO: v0.7.0 || v0.8.0: уйти из json
+# TODO: v0.7.0: убрать ideeeeead и заменить на хелпер
+def get():
+    with open(folder_config / "config.json", "r") as f:
+        return json.load(f)
+
+data = get()
 
 def resolve_templates(obj, context=None):
     if context is None:
@@ -61,12 +73,8 @@ def resolve_templates(obj, context=None):
     else:
         return obj
 
-def get():
-    with open(folder_config / "config.json", "r") as f:
-        return json.load(f)
-
-def get_nested(data, keys, default=None): # возвращает default если пути нет в словаре
-    current = data
+def get_nested(input_data, keys, default=None): # возвращает default если пути нет в словаре
+    current = input_data
 
     for key in keys:
         if isinstance(current, dict) and key in current:
@@ -75,8 +83,8 @@ def get_nested(data, keys, default=None): # возвращает default есл�
             return default
     return current
 
-def set_nested(data, keys, value): # ставит значение value в пути, если не существует путь, создает его
-    current = data
+def set_nested(input_data, keys, value): # ставит значение value в пути, если не существует путь, создает его
+    current = input_data
 
     for key in keys[:-1]:
         if key not in current or not isinstance(current[key], dict):
@@ -84,37 +92,35 @@ def set_nested(data, keys, value): # ставит значение value в пу
         current = current[key]
 
     current[keys[-1]] = value
-    return data
+    return input_data
 
 def set_value(config_path, value):
-    with open((folder_config / "config.json"), "r") as f:
-        data = json.load(f)
-
     path = config_path.split(".")
 
     if get_nested(data, path) is not None:
-        data = set_nested(data, path, value)
+        output_data = set_nested(data, path, value)
     else:
         print("E: No Path Found")
 
     with open((folder_config / "config.json"), "w") as f:
-        json.dump(data, f, indent=4, ensure_ascii=False)
+        json.dump(output_data, f, indent=4, ensure_ascii=False)
+
+    print(f"{config_path}: {value}")
 
 def get_value(config_path):
-    with open((folder_config / "config.json"), "r") as f:
-        data = json.load(f)
-
     path = config_path.split(".")
     value = get_nested(data, path)
     if value is not None:
         # TODO: изменить формат вывода
-        print(value)
+        print(f"{config_path}: {value}")
     else:
         print("E: No Path Found")
 
 def reset_value(config_path):
-    with open((folder_config / "config.json"), "r") as f:
-        data = json.load(f)
+    if not _warning(data["warnings"]["config"]["reset_one"]):
+        print("Abort")
+        return
+
     with open((Path(__file__).parent / "default_config.json"), "r") as f:
         default_data = json.load(f)
 
@@ -126,17 +132,23 @@ def reset_value(config_path):
     else:
         print("E: No Path Found")
 
-
+# HACK: добавить "Отказ" в конфиг
+# TODO: функцию warning вставить в updater.main() лучше всего
 def update():
-    updater.main()
+    if _warning(data["warnings"]["config"]["update"]):
+        updater.main()
+    else: print("Abort")
 
 def reset_settings():
-    # INFO: открываем файл default_config.json и перемещаем в data
+    if not _warning(data["warnings"]["config"]["reset_all"]):
+        print("Abort")
+        return
+
     with open((Path(__file__).parent / "default_config.json"), "r") as f:
-        data = json.load(f)
+        default_data = json.load(f)
 
     # INFO: функция проходит по data и меняет {a.b.c.d} на настоящие имена
-    resolved = resolve_templates(data)
+    resolved = resolve_templates(default_data)
 
     # INFO: берем путь из resolved:paths.config (написал в кратком виде) и файл resolved.config.name
     config_path = folder_config / "config.json"
@@ -145,8 +157,7 @@ def reset_settings():
     config_path.parent.mkdir(parents=True, exist_ok=True)
 
     with open(config_path, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=4, ensure_ascii=False)
-
+        json.dump(default_data, f, indent=4, ensure_ascii=False)
 
 def load_config():
     pass

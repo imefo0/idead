@@ -40,7 +40,7 @@ def main():
             f.write(f"module: {module}\n")
             f.write(f"date: {datetime.now().strftime("%Y-%m-%d %H:%M")}\n")
             f.write(f"{r}\n")
-            f.write(f"{"-"*30}")
+            f.write(f"{"-"*30}\n")
 
         # добавляем пройденные тесты и общее количество тестов
         completed += result[-1][0]
