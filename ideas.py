@@ -332,11 +332,19 @@ class Column:
     def __init__(self, name: str, lines: list[str] = None):
         self.name = name
         self.lines = lines if lines is not None else []
-        self.width = 0
+        self._width = None
         self.no_column_found_symbol = "-"
 
-        for line in [self.name, *self.lines]:
-            if (len_of_line := len(str(line))) > self.width: self.width = len_of_line
+        # WARN: убрать
+        #for line in [self.name, *self.lines]:
+            #if (len_of_line := len(str(line))) > self.width: self.width = len_of_line
+
+    @property
+    def width(self) -> int:
+        # TODO: изменить
+        max_val_len = max((len(v) for v in self.lines), default=0)
+        self._width = max(len(self.name), max_val_len)
+        return self._width
 
     def __str__(self):
         return f"Class Column:\nName: {self.name}\nWidth: {self.width}\nLines: {self.lines}"
