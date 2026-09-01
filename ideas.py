@@ -631,30 +631,17 @@ def list_ideas(max_results=None):
                     columns_data["name"].append(name)
             # INFO: ну нафиг эту поддержку - не актуально
             if "description" in table_columns or "desc" in table_columns: # WARN: поддерживаем старый вариант
-                sep = [i for i, line in enumerate(raw_content) if line.strip() == "---"]
+                desc_lines = _extract_description(raw_content)
 
-                if len(sep) >= 2:
-                    desc_lines = raw_content[sep[1] + 1:]
-                elif len(sep) == 1:
-                    desc_lines = raw_content[sep[0] + 1:]
-                else:
-                    desc_lines = raw_content
                 # WARN: до v0.7.0: если значения не будет то тогда писать предупреждение что ее нет и ставить из default_config.json 
-                separator_description = data["settings"]["ideas"]["list"]["separator_description"]
-                desc = separator_description.join(desc_lines) # TODO: добавить разделитель в конфиг - добавлено
-
-                auto = data["settings"]["ideas"]["list"]["max_symbols"]["auto"]["description"]
-                etc = data["settings"]["ideas"]["list"]["etc"]["description"]
-                if not auto:
-                    max_symbols_of_desc = data["settings"]["ideas"]["list"]["max_symbols"]["description"]
-                    if len(desc) > max_symbols_of_desc:
-                        desc = f"{desc[:max_symbols_of_desc - len(etc)]}{etc}"
-                else:
+                columns_data["description"].append(format_field(
+                    desc_lines,
+                    auto = data["settings"]["ideas"]["list"]["max_symbols"]["auto"]["description"],
+                    etc = data["settings"]["ideas"]["list"]["etc"]["description"],
+                    sep = data["settings"]["ideas"]["list"]["separator_description"],
+                    max_symbols_of_field = data["settings"]["ideas"]["list"]["max_symbols"]["description"],
                     max_symbols_of_col = len(default_cols["description"])
-                    if len(desc) > max_symbols_of_col:
-                        desc = f"{desc[:max_symbols_of_col - len(etc)]}{etc}"
-
-                columns_data["description"].append(desc)
+                ))
 
             if "version" in table_columns: # TODO: добавить поддержку ver
                 if (version := _get_value_from_metadata(fcontent, "version"))[0]: version = version[1]
