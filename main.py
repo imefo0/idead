@@ -7,7 +7,19 @@ import uuid
 from config import *
 from ideas import *
 from typing import Any
-import test.test
+
+file = folder_cache / "module_test_status.txt"
+
+try:
+    import test.test
+    # Тесты доступны — записываем 0 и ничего не выводим
+    if not file.exists():
+        file.write_text("0")
+except ModuleNotFoundError:
+    # Тестов нет — выводим предупреждение и записываем 1
+    if not file.exists():
+        print("WARN: command 'idead test' does not work in this build!")
+        file.write_text("1")
 
 command = sys.argv[1:]
 data = get()
@@ -191,7 +203,24 @@ def main():
             elif command[2] == "reset":
                 reset_value(command[1])
         elif command[0] == "test":
-            test.test.main()
+            file = folder_cache / "module_test_status.txt"
+
+            # Если файла нет — проверяем в первый раз
+            if not file.exists():
+                try:
+                    import test.test
+                    file.write_text("0")  # Тесты доступны
+                except ModuleNotFoundError:
+                    print("WARN: command 'idead test' does not work in this build!")
+                    file.write_text("1")  # Тесты недоступны
+            else:
+                # Файл уже есть — читаем статус
+                status = file.read_text().strip()
+                if status == "0":
+                    import test.test
+                    test.test.main()  # Запускаем тесты
+                else:  # status == "1"
+                    print("WARN: command 'idead test' is not available in this build.")
 
 
 
