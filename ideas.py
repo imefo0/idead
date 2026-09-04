@@ -1060,6 +1060,8 @@ def list_ideas(max_results=None):
     # INFO: zip нужно когда надо пройти по 2 спискам одновременно
     # если надо до самого длинного то from itertools import zip_longest (недостающие значения заполняются None)
     # WARN: если будет 10k-50k+ идей то раздуется память - не актуально (хотя...)
+    list_settings = data["settings"]["ideas"]["list"]
+
     for idea in ideas[:limit]:
         if any(x in ["date", "uuid", "time"] for x in table_columns):
             finfo = _parse_filename_info(idea)
@@ -1077,14 +1079,14 @@ def list_ideas(max_results=None):
 
                     columns_data["name"].append(format_field(
                         name,
-                        auto = data["settings"]["ideas"]["list"]["max_symbols"]["auto"]["name"],
-                        etc = data["settings"]["ideas"]["list"]["etc"]["name"],
-                        max_symbols_of_field = data["settings"]["ideas"]["list"]["max_symbols"]["name"],
+                        auto = list_settings["max_symbols"]["auto"]["name"],
+                        etc = list_settings["etc"]["name"],
+                        max_symbols_of_field = list_settings["max_symbols"]["name"],
                         max_symbols_of_col = len(default_cols["name"])
                     ))
                 else:
-                    auto = data["settings"]["ideas"]["list"]["max_symbols"]["auto"]["name"]
-                    max_symbols_of_name = data["settings"]["ideas"]["list"]["max_symbols"]["name"]
+                    auto = list_settings["max_symbols"]["auto"]["name"]
+                    max_symbols_of_name = list_settings["max_symbols"]["name"]
                     max_symbols_of_col = len(default_cols["name"])
                     name = "?" * (max_symbols_of_name if not auto else max_symbols_of_col)
 
@@ -1096,10 +1098,10 @@ def list_ideas(max_results=None):
                 # WARN: до v0.7.0: если значения не будет то тогда писать предупреждение что ее нет и ставить из default_config.json 
                 columns_data["description"].append(format_field(
                     desc_lines,
-                    auto = data["settings"]["ideas"]["list"]["max_symbols"]["auto"]["description"],
-                    etc = data["settings"]["ideas"]["list"]["etc"]["description"],
-                    sep = data["settings"]["ideas"]["list"]["separator_description"],
-                    max_symbols_of_field = data["settings"]["ideas"]["list"]["max_symbols"]["description"],
+                    auto = list_settings["max_symbols"]["auto"]["description"],
+                    etc = list_settings["etc"]["description"],
+                    sep = list_settings["separator_description"],
+                    max_symbols_of_field = list_settings["max_symbols"]["description"],
                     max_symbols_of_col = len(default_cols["description"])
                 ))
 
