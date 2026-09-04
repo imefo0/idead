@@ -159,6 +159,24 @@ def min_lens(*args: int):
 
     return result
 
+def _identify_range(diapason: str, base: int = 0) -> list[int]:
+    raw_nums = diapason.split("..")
+    result = []
+    #print("raw_nums:", raw_nums)
+    if raw_nums[0].isdigit() and raw_nums[1].isdigit():
+        #print("IS DIGIT")
+        num_range = list(map(int, [(int(raw_nums[0]) + base - 1), (int(raw_nums[1]) + base - 1)]))
+        #print("num_range:", num_range)
+        if int(num_range[0]) <= int(num_range[1]):
+            #print(f"{num_range[0]} <= {num_range[1]}")
+            for num in range(num_range[0], num_range[1] + 1):
+                result.append(num)
+                #print("append:", num)
+        else:
+            for num in range(num_range[0], num_range[1] - 1, -1):
+                result.append(num)
+    return result
+
 # TODO: обновить ux всех remove и добавить флаг по триграммам
 # TODO: обновить способ поиска в remove
 # TODO: добавить поиск идеи по описанию в v0.7.0
