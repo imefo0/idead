@@ -307,10 +307,121 @@ def remove_idea(*, date=None, time=None, uuid6=None, name=None):
     names = [_get_value_from_metadata(_extract_metadata_as_list((folder_ideas / x).read_text().splitlines()), "name") for x in files]
     weights = []
 
-    # проходимся по каждому файлу
+    """
+    if not ideas:
+        print("E: No Ideas Found")
+        return
+
+    table_columns = data["settings"]["ideas"]["list"]["table_columns"]
+
+    description_list = []
+    columns_data = { # NOTE: защита от дурака есть, потому что в классе Column предусмотренно что если есть недостающие строки
+        "number": [],
+        "date": [],
+        "name": [],
+        "description": description_list,
+        "desc": description_list,
+        "time": [],
+        "uuid": [],
+        "version": [],
+        "score": []
+    }
+    description_list_candidate = []
+    candidates_data = {
+        "number": [],
+        "date": [],
+        "name": [],
+        "description": description_list_candidate,
+        "desc": description_list_candidate,
+        "time": [],
+        "uuid": [],
+        "version": [],
+        "score": []
+    }
+    default_cols = { # TODO: v0.7.0: добавить эти все настройки в конфиг
+        # TODO: добавить type (i- - idea, g- guide и тд (префикс в файле))
+        "number": "№",
+        "date": "date",
+        "name": "name",
+        "description": "description", # TODO: v0.7.0: изменить в конфиге desc на description (ключ, не значение)
+        "desc": "description",
+        "time": "time",
+        "uuid": "uuid",
+        "version": "version",
+        "score": "score"
+    }
+
+    remove_settings = data["settings"]["ideas"]["remove"]
+    """
     num = 0
-    for i in _get_list_of_files(folder_ideas): # i202608041359_dd0cd3.md -> i 2026-08-04 13:59 _ dd0cd3 .md
-        # сохраняем данные кандидата
+    """
+    for idea in ideas: # i202608041359_dd0cd3.md -> i 2026-08-04 13:59 _ dd0cd3 .md
+        finfo = _parse_filename_info(idea)
+
+        if date is not None and finfo["date"] != date: continue
+        if time4 is not None and finfo["time"] != time4: continue
+        if uuid6 is not None and finfo["uuid"] != uuid6: continue
+        if name is not None:
+            if name is None or (name == candidate_name and remove_idea_match_mode == "hard"):
+                coincidences.append(i)
+                continue
+            if remove_idea_match_mode != "hard":
+                score = _jaccard_similarity(_to_trigram(name), _to_trigram(candidate_name))
+                if score != 0.0:
+                    coincidences.append(i)
+                    weights.append((num, score))
+
+
+
+
+        if any(x in ["date", "uuid", "time"] for x in table_columns):
+            if "date" in table_columns: candidates_data["date"].append(finfo["date"])
+            if "uuid" in table_columns: candidates_data["uuid"].append(finfo["uuid"])
+            if "time" in table_columns: candidates_data["time"].append(finfo["time"])
+
+        if any(x in ["name", "description", "desc", "version"] for x in table_columns):
+            raw_content = (folder_ideas / idea).read_text().splitlines()
+            fcontent = _extract_metadata_as_list(raw_content)
+
+            if "name" in table_columns:
+                if (name := _get_value_from_metadata(fcontent, "name"))[0]:
+                    name = name[1]
+
+                    candidates_data["name"].append(format_field(
+                        name,
+                        auto = remove_settings["max_symbols"]["auto"]["name"],
+                        etc = remove_settings["etc"]["name"],
+                        max_symbols_of_field = remove_settings["max_symbols"]["name"],
+                        max_symbols_of_col = len(default_cols["name"])
+                    ))
+                else:
+                    auto = remove_settings["max_symbols"]["auto"]["name"]
+                    max_symbols_of_name = remove_settings["max_symbols"]["name"]
+                    max_symbols_of_col = len(default_cols["name"])
+                    name = "?" * (max_symbols_of_name if not auto else max_symbols_of_col)
+
+                    candidates_data["name"].append(name)
+            # INFO: ну нафиг эту поддержку - не актуально
+            if "description" in table_columns or "desc" in table_columns: # WARN: поддерживаем старый вариант
+                desc_lines = _extract_description(raw_content)
+
+                # WARN: до v0.7.0: если значения не будет то тогда писать предупреждение что ее нет и ставить из default_config.json 
+                candidates_data["description"].append(format_field(
+                    desc_lines,
+                    auto = remove_settings["max_symbols"]["auto"]["description"],
+                    etc = remove_settings["etc"]["description"],
+                    sep = remove_settings["separator_description"],
+                    max_symbols_of_field = remove_settings["max_symbols"]["description"],
+                    max_symbols_of_col = len(default_cols["description"])
+                ))
+
+            if "version" in table_columns: # TODO: добавить поддержку ver
+                if (version := _get_value_from_metadata(fcontent, "version"))[0]: version = version[1]
+                else: version = "?.?"
+
+                candidates_data["version"].append(version)
+        """
+    for i in _get_list_of_files(folder_ideas):
         candidate_date = i[1:9]
         candidate_time = i[9:13]
         candidate_uuid = i[14:20]
