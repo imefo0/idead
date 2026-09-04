@@ -779,11 +779,11 @@ class TableRenderer:
 
         return result
 
-if __name__ == "__main__":
-    col1 = Column("name")     # lines = []
-    col2 = Column("test")     # lines = [] (этот же список!)
-    col1.lines.append("hello")
-    print(col2.lines)  # ['hello']  # БАГ!
+#if __name__ == "__main__":
+    #col1 = Column("name")     # lines = []
+    #col2 = Column("test")     # lines = [] (этот же список!)
+    #col1.lines.append("hello")
+    #print(col2.lines)  # ['hello']  # БАГ!
 
     #table = TableRenderer([Column(x, ["1", "2", "34", "123456"]) for x in ["name", "test", "desc", "testing", "a"]] + [Column("abc", "a")])
     #print(table)
@@ -858,6 +858,8 @@ def search_idea(text): # TODO: добавить поиск только по и�
     # INFO: zip нужно когда надо пройти по 2 спискам одновременно
     # если надо до самого длинного то from itertools import zip_longest (недостающие значения заполняются None)
     # WARN: если будет 10k-50k+ идей то раздуется память - не актуально (хотя...)
+    search_settings = data["settings"]["ideas"]["search"]
+
     for index, score in ideas_scores[:limit]:
         if any(x in ["date", "uuid", "time"] for x in table_columns):
             finfo = _parse_filename_info(ideas[index])
@@ -866,7 +868,9 @@ def search_idea(text): # TODO: добавить поиск только по и�
             if "time" in table_columns: columns_data["time"].append(finfo["time"])
 
         if "score" in table_columns:
-            columns_data["score"].append(score)
+            if search_settings["score_style"] == "percent":
+                columns_data["score"].append(f"{score * 100:>3.0f}%")
+            else: columns_data["score"].append(score)
 
         if any(x in ["name", "description", "desc", "version"] for x in table_columns):
             raw_content = (folder_ideas / ideas[index]).read_text().splitlines()
@@ -878,14 +882,14 @@ def search_idea(text): # TODO: добавить поиск только по и�
 
                     columns_data["name"].append(format_field(
                         name,
-                        auto = data["settings"]["ideas"]["search"]["max_symbols"]["auto"]["name"],
-                        etc = data["settings"]["ideas"]["search"]["etc"]["name"],
-                        max_symbols_of_field = data["settings"]["ideas"]["search"]["max_symbols"]["name"],
+                        auto = search_settings["max_symbols"]["auto"]["name"],
+                        etc = search_settings["etc"]["name"],
+                        max_symbols_of_field = search_settings["max_symbols"]["name"],
                         max_symbols_of_col = len(default_cols["name"])
                     ))
                 else:
-                    auto = data["settings"]["ideas"]["search"]["max_symbols"]["auto"]["name"]
-                    max_symbols_of_name = data["settings"]["ideas"]["search"]["max_symbols"]["name"]
+                    auto = search_settings["max_symbols"]["auto"]["name"]
+                    max_symbols_of_name = search_settings["max_symbols"]["name"]
                     max_symbols_of_col = len(default_cols["name"])
                     name = "?" * (max_symbols_of_name if not auto else max_symbols_of_col)
 
@@ -896,10 +900,10 @@ def search_idea(text): # TODO: добавить поиск только по и�
                 # WARN: до v0.7.0: если значения не будет то тогда писать предупреждение что ее нет и ставить из default_config.json 
                 columns_data["description"].append(format_field(
                     desc_lines,
-                    auto = data["settings"]["ideas"]["search"]["max_symbols"]["auto"]["description"],
-                    etc = data["settings"]["ideas"]["search"]["etc"]["description"],
-                    sep = data["settings"]["ideas"]["search"]["separator_description"],
-                    max_symbols_of_field = data["settings"]["ideas"]["search"]["max_symbols"]["description"],
+                    auto = search_settings["max_symbols"]["auto"]["description"],
+                    etc = search_settings["etc"]["description"],
+                    sep = search_settings["separator_description"],
+                    max_symbols_of_field = search_settings["max_symbols"]["description"],
                     max_symbols_of_col = len(default_cols["description"])
                 ))
 
