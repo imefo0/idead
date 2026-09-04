@@ -291,7 +291,8 @@ if __name__ == "__main__":
 # TODO: обновить способ поиска в remove
 # TODO: добавить поиск идеи по описанию в v0.7.0
 # FIXME: исправить косметический баг когда выводится в found 1+ ideas for name, :
-def remove_idea(date=None, time=None, uuid6=None, name=None):
+# TODO: v0.7.0: добавить удаление идей с помошью 1..5 и это будет работать как 1, 2, 3, 4, 5
+def remove_idea(*, date=None, time=None, uuid6=None, name=None):
     remove_idea_match_mode = data["settings"]["ideas"]["remove"].get("search_mode", "soft") # hard/soft
 
     if date is None and time is None and uuid6 is None and name is None:
