@@ -177,6 +177,116 @@ def _identify_range(diapason: str, base: int = 0) -> list[int]:
                 result.append(num)
     return result
 
+def _parse_select_answer(answer: str, *, all_len: int = -1) -> list[int]:
+    # NOTE: можно написать 1 и будет [1]
+    # если написать 1,2,3 или даже 1, 2, 3 то будет [1,2,3]
+    # если написать 1..9, 12, 13, -9 то будет [1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13]
+    # если написать -7, -4, -3, abc, sdff то будет []
+    # если написать 1, 2, 3, 7..5 то будет [1, 2, 3, 7, 6, 5]
+    # NOTE:
+    # если написать 1, 2, 4, 1..4 то будет [1, 2, 4, 3]
+    # если написать 1 .. 4 или 1.. 4 или 1 ..4 то будет [1, 2, 3, 4]
+    # NOTE:
+    # v0.8.0+: добавить поддержку 1..4:2 где 2 это каждый второй или a..b:x что означает от a до b включая их но каждое x число
+    # добавить поддержку -1 которая означает либо "все" либо "последний элемент" (настройка в конфиге)
+    # добавить ЭТО: "n=*, a=1..4, b=3..6, a&b, 6..10?n>4+n<9". вот что означает:
+    # сказать что n это все элементы, a это числа от 1 до 4, b это числа от 3 до 6
+    # вывести числа которые являются объеденением a и b
+    # и все числа от 6 до 10 но при условии что n>4 и n<9 либо сделать 6..10?n>4&n<9 
+    # добавить флаг в функцию base который по умолчанию 0, то есть начинаем с нуля, но все примеры выше с base=1
+    # ДОБАВИТЬ ЦИКЛЫ n>1..4: (n+3)..n?n<2
+    # j=10, n>1..10: n+j, j--
+    # даже n>1..10: n?n==3??n-1 и это будет работать так: for n in range(1, 11):
+    #     if n == 3: lst.append(n)
+    #     else: lst.append(n-1)
+    # ЧТО ЭТО n>1..10: n?n<3??(n?n<7??n*2?n<5??n*3)
+    # n>1..10: n?n==1??1?n==2??2?n==3??3?n==4??4?5
+    # добавить while
+    # а выход их цикла это ;
+    # добавить функцию: $a#c#d: c+d; x=0, y=3, n>1..10: a#x#y, x=x+2, y--; (означает def a(c, d): return c+d)
+    # $fib#n: n?n<2??fib#n-1+fib#n-2; n>1..10: fib#n
+    # Enter number or DSL-request / query - сообщение
+    commands = answer.replace(" ", "").split(";")
+    commands = [(cmd if "," not in cmd and not cmd.isdigit() else cmd.split(",")) for cmd in commands]
+
+    # TODO: добавить в конфиг
+    base = 0
+    list_len = all_len
+    unique = True
+    base_reset = True
+    len_reset = True
+    unique_reset = True
+
+    result = []
+    print("commands:", commands)
+
+    for cmd in commands:
+        # TODO: в функции эти 3 условия
+        if isinstance(cmd, list):
+            #print("base:", base)
+            print("КОМАНДА ЯВЛЯЕТСЯ СПИСКОМ")
+            print(cmd)
+            for sub_cmd in cmd:
+                print("s:", sub_cmd)
+                if ".." in sub_cmd:
+                    print("ЕСТЬ ..!")
+                    result += _identify_range(sub_cmd, base)
+                    print("ДОБАВЛЕННО:", result[-1])
+                else:
+                    if sub_cmd.isdigit(): result.append(int(sub_cmd) + base - 1)
+        else:
+            if ".." in cmd:
+                print("ЕСТЬ ..!")
+                result += _identify_range(cmd, base)
+                print("ДОБАВЛЕННО:", result[-1])
+
+            if cmd.startswith("base") and (raw_base := cmd.replace("base", "").replace(" ", "")).isdigit():
+                base = int(raw_base)
+                base_reset = False
+            else:
+                if base_reset:
+                    base = 0 # default
+
+            if cmd.startswith("len") and ((raw_len := cmd.replace("len", "").replace(" ", "")).isdigit() or raw_len == "*"):
+                if raw_len == "*":
+                    raw_len = -1
+                else:
+                    list_len = min_lens(int(raw_len), all_len) if raw_len.isdigit() else all_len
+                len_reset = False
+            else:
+                if len_reset:
+                    list_len = all_len # default
+
+            if cmd.startswith("unique") and (raw_unique := cmd.replace("unique", "").replace(" ", "")) in ["true", "false"]:
+                unique = True if raw_unique == "true" else False
+                unique_reset = False
+            else:
+                if unique_reset:
+                    unique = True # default
+    print(result)
+
+    # NOTE: в конце обработать unique для result
+    if unique:
+        """
+        Почему это работает
+        Шаг	Что делает	Результат
+        dict.fromkeys(lst)	Создаёт словарь, где ключи — элементы списка (порядок сохраняется)	{1: None, 2: None, 3: None}
+        list(...)	Превращает ключи словаря обратно в список	[1, 2, 3]
+        """
+        result = list(dict.fromkeys(result))
+
+        # len (*), unique (true)
+
+    if list_len != -1: result = result[:list_len]
+
+    print("result:", result)
+    #print(f"reset: {base_reset}, {len_reset}, {unique_reset}")
+    #print(f"base: {base}, len: {list_len}, unique: {unique}")
+    return result
+
+if __name__ == "__main__":
+    _parse_select_answer(input())
+
 # TODO: обновить ux всех remove и добавить флаг по триграммам
 # TODO: обновить способ поиска в remove
 # TODO: добавить поиск идеи по описанию в v0.7.0
