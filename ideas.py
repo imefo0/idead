@@ -218,27 +218,27 @@ def _parse_select_answer(answer: str, *, all_len: int = -1) -> list[int]:
     unique_reset = True
 
     result = []
-    print("commands:", commands)
+    #print("commands:", commands)
 
     for cmd in commands:
         # TODO: в функции эти 3 условия
         if isinstance(cmd, list):
             #print("base:", base)
-            print("КОМАНДА ЯВЛЯЕТСЯ СПИСКОМ")
-            print(cmd)
+            #print("КОМАНДА ЯВЛЯЕТСЯ СПИСКОМ")
+            #print(cmd)
             for sub_cmd in cmd:
-                print("s:", sub_cmd)
+                #print("s:", sub_cmd)
                 if ".." in sub_cmd:
-                    print("ЕСТЬ ..!")
+                    #print("ЕСТЬ ..!")
                     result += _identify_range(sub_cmd, base)
-                    print("ДОБАВЛЕННО:", result[-1])
+                    #print("ДОБАВЛЕННО:", result[-1])
                 else:
                     if sub_cmd.isdigit(): result.append(int(sub_cmd) + base - 1)
         else:
             if ".." in cmd:
-                print("ЕСТЬ ..!")
+                #print("ЕСТЬ ..!")
                 result += _identify_range(cmd, base)
-                print("ДОБАВЛЕННО:", result[-1])
+                #print("ДОБАВЛЕННО:", result[-1])
 
             if cmd.startswith("base") and (raw_base := cmd.replace("base", "").replace(" ", "")).isdigit():
                 base = int(raw_base)
@@ -263,7 +263,7 @@ def _parse_select_answer(answer: str, *, all_len: int = -1) -> list[int]:
             else:
                 if unique_reset:
                     unique = True # default
-    print(result)
+    #print(result)
 
     # NOTE: в конце обработать unique для result
     if unique:
@@ -279,7 +279,7 @@ def _parse_select_answer(answer: str, *, all_len: int = -1) -> list[int]:
 
     if list_len != -1: result = result[:list_len]
 
-    print("result:", result)
+    #print("result:", result)
     #print(f"reset: {base_reset}, {len_reset}, {unique_reset}")
     #print(f"base: {base}, len: {list_len}, unique: {unique}")
     return result
@@ -589,7 +589,7 @@ def remove_idea(*, date=None, time=None, uuid6=None, name=None):
         print("* - Gexz code is DSL which is used to enter ranges")
         command = "base 1;" + input(f"Enter number to delete (1-{len(coincidences)}, 0 to cancel or Gexz* code (beta): ")
         answer = _parse_select_answer(command, all_len=len(coincidences))
-        print(answer)
+        #print(answer)
         if answer == []:
             print("E: Answer is empty")
             print("Abort")
