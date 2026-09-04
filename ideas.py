@@ -430,46 +430,133 @@ def remove_idea(*, date=None, time=None, uuid6=None, name=None):
             print(f"WARN: No Name In Idea (uuid: {candidate_uuid}) Found")
             continue
         candidate_name = result[1]
-        #print(f"date = {candidate_date}, time = {candidate_time}, uuid = {candidate_uuid}, name = {candidate_name}")
 
-        # 1. если совпадают даты или если дата не введена то продолжить
         if date is None or date == candidate_date:
-            # 2. если совпадает время или если время не введено то продолжить
             if time is None or time == candidate_time:
-            # 3. если совпадает uuid или если uuid не введен то продолжить
                 if uuid6 is None or uuid6 == candidate_uuid:
-                    # 4. если совпадет имя и если спсоб hard то добавить в coincidences
                     if name is None or (name == candidate_name and remove_idea_match_mode == "hard"):
                         coincidences.append(i)
                         continue
                     if remove_idea_match_mode != "hard":
-                    # если soft:
-                    # (короче надо вывести весь список идей но в порядке убывания по уверенности, сопоставив каждый инедекс с списком имен файлов)
-                    # надо получить список имен в том порядке в таком же как и в списке файлов (до for i in _get_list_of_files(folder_ideas))
-                    # потом надо написать _trigram_search(candidate_name, name_variants)
                         score = _jaccard_similarity(_to_trigram(name), _to_trigram(candidate_name))
-                        #print("score, num:", score, num)
                         if score != 0.0:
-                            #print("APPEND:", score, num, i)
                             coincidences.append(i)
                             weights.append((num, score))
-                            #print("--- AFTER APPENDING ---")
-                            #print("coincidences:".upper(), coincidences)
-                            #print("weights:".upper(), weights)
-                            #print("-----------------------")
                             num += 1
-                    # потом for i in _trigram_search():
-                    #       coincidences.append(files[i[0]])
     if name is not None and remove_idea_match_mode == "soft":
-        #print("started")
-        #print("weights:", weights)
         weights.sort(key=lambda x: x[1], reverse=True)
         tmp_coincidences = coincidences.copy()
         coincidences = []
         for idx, score in weights:
-            #print(idx, score)
-            #print(tmp_coincidences[idx])
             coincidences.append(tmp_coincidences[idx])
+
+    """
+    # INFO: логика лимита: если -1 то все показывать, иначе,
+    # количество которое указано но если оно больше чем общее количество то только все которые есть
+    limit = _determine_limit(
+        max_results,
+        ideas,
+        default = data["settings"]["ideas"]["list"].get("max_results", -1)
+    )
+
+    # NOTE: новый код, и БЕЗ HACK
+
+    table_columns = data["settings"]["ideas"]["list"]["table_columns"]
+
+    description_list = []
+    columns_data = { # NOTE: защита от дурака есть, потому что в классе Column предусмотренно что если есть недостающие строки
+        "number": list(map(str, list(range(1, len(ideas[:limit])+1)))) if "number" in table_columns else [],
+        "date": [],
+        "name": [],
+        "description": description_list,
+        "desc": description_list,
+        "time": [],
+        "uuid": [],
+        "version": []
+    }
+    default_cols = { # TODO: v0.7.0: добавить эти все настройки в конфиг
+        # TODO: добавить type (i- - idea, g- guide и тд (префикс в файле))
+        "number": "№",
+        "date": "date",
+        "name": "name",
+        "description": "description", # TODO: v0.7.0: изменить в конфиге desc на description (ключ, не значение)
+        "desc": "description",
+        "time": "time",
+        "uuid": "uuid",
+        "version": "version"
+    }
+    # TODO: добавить настройку рядом table_columns которая убирает дубликаты
+
+    # INFO: zip нужно когда надо пройти по 2 спискам одновременно
+    # если надо до самого длинного то from itertools import zip_longest (недостающие значения заполняются None)
+    # WARN: если будет 10k-50k+ идей то раздуется память - не актуально (хотя...)
+    list_settings = data["settings"]["ideas"]["list"]
+
+    for idea in ideas[:limit]:
+        if any(x in ["date", "uuid", "time"] for x in table_columns):
+            finfo = _parse_filename_info(idea)
+            if "date" in table_columns: columns_data["date"].append(finfo["date"])
+            if "uuid" in table_columns: columns_data["uuid"].append(finfo["uuid"])
+            if "time" in table_columns: columns_data["time"].append(finfo["time"])
+
+        if any(x in ["name", "description", "desc", "version"] for x in table_columns):
+            raw_content = (folder_ideas / idea).read_text().splitlines()
+            fcontent = _extract_metadata_as_list(raw_content)
+
+            if "name" in table_columns:
+                if (name := _get_value_from_metadata(fcontent, "name"))[0]:
+                    name = name[1]
+
+                    columns_data["name"].append(format_field(
+                        name,
+                        auto = list_settings["max_symbols"]["auto"]["name"],
+                        etc = list_settings["etc"]["name"],
+                        max_symbols_of_field = list_settings["max_symbols"]["name"],
+                        max_symbols_of_col = len(default_cols["name"])
+                    ))
+                else:
+                    auto = list_settings["max_symbols"]["auto"]["name"]
+                    max_symbols_of_name = list_settings["max_symbols"]["name"]
+                    max_symbols_of_col = len(default_cols["name"])
+                    name = "?" * (max_symbols_of_name if not auto else max_symbols_of_col)
+
+                    columns_data["name"].append(name)
+            # INFO: ну нафиг эту поддержку - не актуально
+            if "description" in table_columns or "desc" in table_columns: # WARN: поддерживаем старый вариант
+                desc_lines = _extract_description(raw_content)
+
+                # WARN: до v0.7.0: если значения не будет то тогда писать предупреждение что ее нет и ставить из default_config.json 
+                columns_data["description"].append(format_field(
+                    desc_lines,
+                    auto = list_settings["max_symbols"]["auto"]["description"],
+                    etc = list_settings["etc"]["description"],
+                    sep = list_settings["separator_description"],
+                    max_symbols_of_field = list_settings["max_symbols"]["description"],
+                    max_symbols_of_col = len(default_cols["description"])
+                ))
+
+            if "version" in table_columns: # TODO: добавить поддержку ver
+                if (version := _get_value_from_metadata(fcontent, "version"))[0]: version = version[1]
+                else: version = "?.?"
+
+                columns_data["version"].append(version)
+
+    columns = []
+    for column in filter(lambda x: x in default_cols, table_columns):
+        columns.append(Column(default_cols[column], columns_data[column]))
+
+    sep_settings = data["settings"]["ideas"]["list"]["separator"]
+    table = TableRenderer(columns).config(
+        line_separator = sep_settings["line"],
+        column_separator = sep_settings["column_middle"],
+        column_separator_end = sep_settings["column_end"],
+        column_separator_start = sep_settings["column_start"],
+        is_line_separator_start = sep_settings["line_start"],
+        is_line_separator_middle = sep_settings["line_middle"],
+        is_line_separator_end = sep_settings["line_end"]
+    )
+    print(table.render())
+    """
 
     # TODO: добавить выравнивание у №, добавить настройку столбцов, добавить max_results
     if len(coincidences) == 0: # нет идей
