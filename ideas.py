@@ -585,36 +585,38 @@ def remove_idea(*, date=None, time=None, uuid6=None, name=None):
         print(data["settings"]["all"]["separator_symbol"] * data["settings"]["all"]["separator_length"])
 
         # TODO: переместить в config
-        answer = input(f"Enter number to delete (1-{len(coincidences)}, 0 to cancel or enter ideas via ',' (1,2,3,4)): ")
-        answer = answer.split(",")
-        answer = answer[0] if len(answer) == 1 else answer
-        if not isinstance(answer, list) and not answer.isdigit():
-            print("E: Incorrect number")
+        # TODO: добавить настройку в конфиг чтобы эта звездочка не показывалась и справку
+        print("* - Gexz code is DSL which is used to enter ranges")
+        command = "base 1;" + input(f"Enter number to delete (1-{len(coincidences)}, 0 to cancel or Gexz* code (beta): ")
+        answer = _parse_select_answer(command, all_len=len(coincidences))
+        print(answer)
+        if answer == []:
+            print("E: Answer is empty")
             print("Abort")
-            answer = 0
-        if answer != 0 and answer != "0" and not isinstance(answer, list):
+            return
+        if 0 in answer:
+            print("Abort")
+            return
+
+        if len(answer) == 1:
+            answer = answer[0]
             info = _parse_filename_info(coincidences[answer-1])
             print(f"Selected idea:\ndate: {info["date"]}, uuid: {coincidences[answer-1][14:20]}")
             if _warning(data["warnings"]["ideas"]["delete"]["idea"]):
                 print("Deleting idea...")
                 (folder_ideas / coincidences[answer-1]).unlink()
-        if isinstance(answer, list):
-            for i in answer:
-                if not i.isdigit():
-                    print("E: Incorrect number")
-                    print("Abort")
-                    return
-                if i == "0":
-                    return
+            return
+        if len(answer) > 1:
             print("Selected ideas:")
             for i in answer:
                 info = _parse_filename_info(coincidences[int(i)-1])
-                print(f"date: {info["date"]}, uuid: {info["uuid"]}")
+                print(f"{i} | date: {info["date"]}, uuid: {info["uuid"]}")
 
             if _warning(data["warnings"]["ideas"]["delete"]["ideas"]):
                 print("Deleting ideas...")
                 for i in answer:
                     (folder_ideas / coincidences[int(i)-1]).unlink()
+            return
 
 def remove_idea_by_custom_metadata(): pass
 
