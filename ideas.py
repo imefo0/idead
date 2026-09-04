@@ -147,6 +147,18 @@ def test_new_idea(name, desc):
 
     return uuid6
 
+def min_lens(*args: int):
+    result = None
+    if len(args) == 0:
+        raise TypeError("min_lens expected at least 1 argument, got 0")
+    for arg in args:
+        if not isinstance(arg, int):
+            raise TypeError(f"min_lens требует int а не {type(arg)}")
+        if result is None or (arg < result and arg != -1):
+            result = arg
+
+    return result
+
 # TODO: обновить ux всех remove и добавить флаг по триграммам
 # TODO: обновить способ поиска в remove
 # TODO: добавить поиск идеи по описанию в v0.7.0
